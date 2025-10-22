@@ -1,0 +1,284 @@
+:root {
+    --munchies-green: #A6B28B;
+    --munchies-light-green: #d8e5d9;
+    --munchies-dark-green: #1C352D;
+    --munchies-coral: #F3845B;
+    --munchies-cream: #E8CEC0;
+    --munchies-border-color: #F3C2B0;
+    --sidebar-width: 260px;
+}
+
+body {
+    /*font-family: 'Inter', sans-serif;*/
+    background-color: #f6ece659;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.navbar {
+    background: #A6B28B  !important;
+
+}
+/*!* Nav Bar Styling (Simplified for Top Bar) *!*/
+/*.navbar-brand, .nav-link {*/
+/*    color: var(--munchies-dark-green) !important;*/
+/*    font-weight: 600;*/
+/*}*/
+
+.nav-utility-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--munchies-green);
+    background-color: transparent;
+    color: white;
+    transition: all 0.2s;
+}
+
+.nav-utility-btn:hover {
+    background-color: var(--munchies-green);
+    color: var(--munchies-dark-green);
+}
+/* ----------------------- */
+/* SIDEBAR STYLING */
+/* ----------------------- */
+#sidebar {
+    width: var(--sidebar-width);
+    min-height: calc(100vh - 60px); /* Adjust based on navbar height */
+    background-color: white;
+    padding: 20px 0;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0; /* Prevents shrinking */
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--munchies-dark-green) !important;
+    font-weight: 500;
+    border-left: 5px solid transparent;
+    transition: all 0.2s;
+}
+
+.sidebar-nav .nav-link i {
+    width: 25px;
+    margin-right: 15px;
+    font-size: 1.1rem;
+}
+
+.sidebar-nav .nav-link.active {
+    background-color: var(--munchies-light-green);
+    border-left-color: var(--munchies-coral);
+    font-weight: 700;
+    color: var(--munchies-coral) !important;
+}
+
+.sidebar-nav .nav-link:hover {
+    background-color: var(--munchies-cream);
+}
+
+/* ----------------------- */
+/* MAIN CONTENT STYLING */
+/* ----------------------- */
+#main-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+/* Responsive adjustments for the main content area on smaller screens */
+@media (min-width: 992px) { /* lg breakpoint for sidebar visibility */
+    #main-content {
+        /*margin-left: var(--sidebar-width);*/
+    }
+}
+
+/* ----------------------- */
+/* Existing Component Styles */
+/* ----------------------- */
+
+/* Custom Button Styles (Add Child, Delete, Edit) */
+.btn-add-child {
+    background-color: var(--munchies-cream);
+    border: 1px solid var(--munchies-border-color);
+    color: var(--munchies-dark-green);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+}
+.btn-add-child:hover {
+    background-color: var(--munchies-border-color);
+    color: var(--munchies-dark-green);
+}
+
+.btn-delete {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+.btn-edit {
+    background-color: var(--munchies-green);
+    color: white;
+    border: none;
+}
+
+/* Profile Card Styling */
+.profile-card {
+    background-color: white;
+    border: 2px solid var(--munchies-border-color);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+    height: 100%;
+}
+.profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background-color: var(--munchies-cream);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--munchies-dark-green);
+    margin-bottom: 15px;
+}
+
+/* Allergy Tags */
+.allergy-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin: 5px;
+    border-radius: 50px;
+    border: 1px solid var(--munchies-dark-green);
+    background-color: transparent;
+    color: var(--munchies-dark-green);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.allergy-tag i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+.allergy-tag.active, .allergy-tag:hover {
+    background-color: var(--munchies-dark-green);
+    color: white;
+}
+
+/* Modal Customization */
+.modal-content {
+    border-radius: 20px;
+    border: 2px solid var(--munchies-coral);
+}
+.modal-header {
+    background-color: var(--munchies-light-green);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-bottom: none;
+}
+.modal-footer {
+    border-top: none;
+}
+
+/* Confirmation Bar */
+.confirmation-bar {
+    background-color: var(--munchies-green);
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    display: none; /* Hidden by default */
+}
+
+/* Buttons in Modal Footer */
+.btn-modal-cancel {
+    background-color: var(--munchies-cream);
+    color: var(--munchies-dark-green);
+    border: none;
+}
+.btn-modal-add {
+    background-color: var(--munchies-coral);
+    color: white;
+    border: none;
+}
+.btn-outline-primary {
+    --bs-btn-color: #f3845b;
+    --bs-btn-border-color:#f3845b;
+}
+.bg-primary {
+    background: var(--munchies-green) !important;
+}
+.btn-primary {
+    background-color: var(--munchies-coral);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+}
+.btn-primary:hover,.btn-outline-primary:hover {
+    background-color: #e06d48; /* Slightly darker coral */
+    color: white;
+}
+/* Stats Cards */
+.stats-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+    height: 100%;
+    text-align: center;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.stats-icon.primary {  color: var(--munchies-green); }
+.stats-icon.success {  color: #28a745; }
+.stats-icon.warning {  color: #ffc107; }
+.stats-icon.info {  color: #17a2b8; }
+
+/* Recent Activity Cards */
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.activity-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        min-height: auto;
+    }
+
+    .stats-card {
+        margin-bottom: 20px;
+    }
+}

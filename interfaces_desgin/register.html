@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Munchies - Create Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lilita+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --munchies-green: #A6B28B;
+            --munchies-light-green: #d8e5d9; /* A lighter green for backgrounds/accents */
+            --munchies-dark-green: #1C352D;
+            --munchies-coral: #F3845B;
+            --munchies-cream: #E8CEC0;
+            --munchies-feature-red: #ffffff;
+            --munchies-peach: #F3C2B0;
+            --munchies-border-color: #F3C2B0;
+            --munchies-pink-dark: #E8CEC0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--munchies-light-green);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: #F9F6F3 !important;
+
+        }
+        /* Custom Buttons for Nav */
+        .btn-signin {
+            color: var(--munchies-green);
+            background-color: transparent;
+            border: 2px solid var(--munchies-green);
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+        .btn-signin:hover {
+            background-color: var(--munchies-green);
+            color: white;
+            border-color: var(--munchies-green);
+        }
+
+        .btn-signup {
+            background-color:var(--munchies-pink-dark) ;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        .btn-signup:hover {
+            background-color: #e06d48; /* Slightly darker coral */
+            color: white;
+        }
+
+        /* --- New Full Background Wrapper --- */
+        .content-wrapper {
+            background-image: url('main_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            flex-grow: 1; /* Ensures it takes up remaining vertical space */
+            position: relative;
+        }
+
+        /* --- Collage Styling (Keep for design consistency) --- */
+        .image-collage {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        .collage-item {
+            width: 120px;
+            height: 80px;
+            margin: 10px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: absolute;
+            background-color: #a7bfa4; /* Placeholder for image */
+            border: 4px solid var(--munchies-light-green);
+            opacity: 0.9;
+        }
+
+        /* Positioning the angled boxes (mimicking the collage in the image) */
+        .item-1 { top: 70px; left: 10px; transform: rotate(-10deg); width: 150px; height: 100px;}
+        .item-2 { top: 180px; left: 10px; transform: rotate(5deg); }
+        .item-3 { top: 260px; left: 50px; transform: rotate(-15deg); width: 140px; height: 90px; }
+        .item-4 { top: 380px; left: 0px; transform: rotate(10deg); }
+        .item-5 { top: 480px; left: 20px; transform: rotate(-5deg); width: 130px; }
+
+        @media (max-width: 991.98px) {
+            .image-collage { display: none; } /* Hide collage on small screens */
+        }
+
+        /* --- Text Section Styling --- */
+        .marketing-text {
+            color: var(--munchies-dark-green);
+            padding: 50px;
+            padding-top: 150px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .marketing-text h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .marketing-text p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+        .marketing-text .accent-bar {
+            width: 8px;
+            height: 40px;
+            background-color: var(--munchies-coral);
+            position: absolute;
+            right: 0px;
+            top: 140px;
+            border-radius: 2px;
+        }
+
+        .form-card {
+
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Form Control and Input Styling */
+        .form-control, .form-select {
+            border-radius: 10px;
+            height: 50px; /* Consistent height for inputs */
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--munchies-green);
+            box-shadow: 0 0 0 0.25rem rgba(166, 178, 139, 0.25);
+        }
+
+        /* --- Step Indicator Styling --- */
+        .step-indicator {
+            padding: 9px 31px !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border: 1px solid var(--munchies-border-color);
+            border-radius: 20px;
+            background-color: var(--munchies-pink-dark); /* Background color of the container */
+        }
+        .step-circle {
+            width: 30px; /* Slightly larger circles */
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--munchies-border-color);
+            background-color: #fff;
+            color: var(--munchies-border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle.completed {
+            /* Step 1: Account (Green circle, white checkmark) */
+            background-color: var(--munchies-green);
+            border-color: var(--munchies-green);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .step-circle.current {
+            /* Step 2: Address (Empty white circle with dark border/subtle glow) */
+            background-color: #fff;
+            border-color: var(--munchies-dark-green);
+            box-shadow: 0 0 0 4px rgba(166, 178, 139, 0.2);
+            color: var(--munchies-dark-green);
+        }
+
+        .step-text {
+            font-size: 0.8rem;
+            color: var(--munchies-dark-green);
+        }
+
+        .step-text.current {
+            font-weight: 600;
+            color: var(--munchies-dark-green);
+        }
+
+        .step-text-wrap {
+            display: flex;
+            flex-direction: column;
+            align-content: space-between;
+            align-items: center;
+        }
+        .step-line {
+            position: absolute;
+            top: 14px; /* Adjust based on circle size */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px; /* Thicker line */
+            background-color: var(--munchies-border-color);
+            z-index: 0;
+        }
+
+        /* Button Styling */
+        .btn-munchies-cream {
+            /* Used for the 'Back' button */
+            background-color: var(--munchies-cream);
+            color: var(--munchies-dark-green);
+            border: 1px solid var(--munchies-border-color);
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. Navigation Bar -->
+<nav class="navbar navbar-expand-lg bg-white sticky-top shadow-sm ">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center fw-bolder" href="#" style="color: var(--munchies-dark-green);">
+            <img src="logo.png">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fs-6 fw-semibold">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" style="color: var(--munchies-dark-green);">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: var(--munchies-dark-green);">Lunchboxes Library</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: var(--munchies-dark-green);">Packages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" style="color: var(--munchies-dark-green);">Contact Us</a>
+                </li>
+            </ul>
+            <div class="d-flex gap-3 mt-3 mt-lg-0">
+                <button class="btn btn-signin" type="button">Sign In</button>
+                <button class="btn btn-signup" type="button">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content Wrapper with full background image -->
+<div class="content-wrapper">
+    <!-- Main Content Grid -->
+    <div class="container-fluid d-flex py-5" style="min-height: calc(100vh - 70px);">
+        <div class="row w-100 align-items-center">
+            <div class="col-lg-7 d-flex align-items-center justify-content-center position-relative">
+                <div class="marketing-text text-start ms-lg-5 ps-lg-5 w-75">
+                    <div class="accent-bar d-none d-lg-block"></div>
+                    <h1 style="color: var(--munchies-dark-green)" class="mb-3">Welcome To Munchies</h1>
+                    <p class="mb-0">Where we make planning your kid's lunchbox easy for you.</p>
+                </div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="col-lg-5 d-flex align-items-center py-5 py-lg-0">
+                <div class="form-card w-100">
+
+                    <!-- STEP INDICATOR -->
+                    <div class="step-indicator" id="step-indicator">
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-1">1</div>
+                            <div class="step-text" id="text-1">Account</div>
+                        </div>
+                        <div class="step-line" style="width: calc(33.33% - 50px);"></div>
+
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-2">2</div>
+                            <div class="step-text" id="text-2">Address</div>
+                        </div>
+                        <div class="step-line" style="width: calc(33.33% - 50px);"></div>
+
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-3">3</div>
+                            <div class="step-text" id="text-3">Notifications</div>
+                        </div>
+                        <div class="step-line" style="width: calc(33.33% - 50px);"></div>
+
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-4">4</div>
+                            <div class="step-text" id="text-4">Confirmation</div>
+                        </div>
+                    </div>
+
+                    <form id="multi-step-form">
+
+                        <!-- STEP 1: ACCOUNT DETAILS -->
+                        <div id="step-1-content" class="step-content">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Create Account</h3>
+
+                            <!-- Name Fields -->
+                            <div class="row mb-3 gx-3">
+                                <div class="col-6">
+                                    <input type="text" class="form-control" placeholder="First Name" required>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" placeholder="Last Name" required>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <input type="email" class="form-control" placeholder="Email Address" required>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" placeholder="Phone Number">
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" placeholder="Password" required>
+                                    <span class="input-group-text bg-white" style="border-left: 0; border-color: var(--munchies-border-color); cursor: pointer;">
+                                        <i class="fas fa-eye-slash text-muted"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" placeholder="Confirm Password" required>
+                                    <span class="input-group-text bg-white" style="border-left: 0; border-color: var(--munchies-border-color); cursor: pointer;">
+                                        <i class="fas fa-eye-slash text-muted"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div> <!-- end step-1-content -->
+
+                        <!-- STEP 2: ADDRESS DETAILS -->
+                        <div id="step-2-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Delivery Information</h3>
+                            <p class="text-center mb-4" style="color: var(--munchies-dark-green);">Select your location on the map</p>
+
+                            <!-- Map Placeholder -->
+                            <div class="map-placeholder border border-2 rounded-3 mb-4 p-3" style="height: 200px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-color: var(--munchies-border-color) !important;">
+                                <img src="https://placehold.co/400x150/A6B28B/fff?text=Map+Placeholder" alt="Map Placeholder" class="img-fluid rounded-3">
+                            </div>
+
+                            <div class="text-center text-muted my-3">
+                                <small>- OR Enter data manually -</small>
+                            </div>
+
+                            <!-- City Dropdown -->
+                            <div class="mb-3">
+                                <select class="form-select form-control" aria-label="Select City" required>
+                                    <option selected>Select City</option>
+                                    <option value="1">Montreal</option>
+                                    <option value="2">Toronto</option>
+                                    <option value="3">Vancouver</option>
+                                </select>
+                            </div>
+
+                            <!-- Street Name -->
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Street Name" required>
+                            </div>
+
+                            <!-- Apartment/Building Details -->
+                            <div class="mb-4">
+                                <input type="text" class="form-control" placeholder="Apartment, House Or Building Details">
+                            </div>
+                        </div> <!-- end step-2-content -->
+
+                        <!-- STEP 3: NOTIFICATIONS -->
+                        <div id="step-3-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Notification Preferences</h3>
+                            <p class="text-center mb-4 text-muted">Tell us how you want to receive updates.</p>
+
+                            <div class="form-check p-4 mb-3 border rounded-3" style="border-color: var(--munchies-border-color); background-color: var(--munchies-light-green);">
+                                <input class="form-check-input" type="checkbox" value="" id="email-notif" checked>
+                                <label class="form-check-label fw-bold" for="email-notif" style="color: var(--munchies-dark-green);">
+                                    Email Updates
+                                </label>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">Receive weekly lunchbox inspiration and monthly promotions.</p>
+                            </div>
+
+                            <div class="form-check p-4 mb-4 border rounded-3" style="border-color: var(--munchies-border-color); background-color: var(--munchies-light-green);">
+                                <input class="form-check-input" type="checkbox" value="" id="sms-notif">
+                                <label class="form-check-label fw-bold" for="sms-notif" style="color: var(--munchies-dark-green);">
+                                    SMS Alerts
+                                </label>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">Get delivery confirmations and critical service alerts via text message.</p>
+                            </div>
+
+                            <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;">
+                                Manage your settings later in your profile.
+                            </p>
+                        </div> <!-- end step-3-content -->
+
+                        <!-- STEP 4: CONFIRMATION -->
+                        <div id="step-4-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Review & Finish</h3>
+
+                            <div class="summary-box p-4 rounded-3" style="border: 2px solid var(--munchies-green); background-color: var(--munchies-light-green);">
+                                <h5 class="fw-bold" style="color: var(--munchies-dark-green);">All Done!</h5>
+                                <p class="text-muted mb-3" style="font-size: 0.9rem;">Review your details and click 'Finish' to complete registration.</p>
+
+                                <ul class="list-unstyled" style="font-size: 0.95rem;">
+                                    <li class="mb-2"><strong>Name:</strong> <span class="float-end text-break" id="summary-name">User Name</span></li>
+                                    <li class="mb-2"><strong>Email:</strong> <span class="float-end text-break" id="summary-email">user@example.com</span></li>
+                                    <li class="mb-2"><strong>City:</strong> <span class="float-end" id="summary-city">Montreal</span></li>
+                                    <li class="mb-2"><strong>Street:</strong> <span class="float-end text-break" id="summary-street">123 Maple Street</span></li>
+                                    <li class="mb-2"><strong>Updates:</strong> <span class="float-end" id="summary-notifs">Email Only</span></li>
+                                </ul>
+                            </div>
+
+                            <p class="text-center mt-4 fw-semibold" style="color: var(--munchies-dark-green);">
+                                You're one click away from simple lunch planning!
+                            </p>
+                        </div> <!-- end step-4-content -->
+
+
+                        <!-- ACTION BUTTONS (Visible for Steps 1-4) -->
+                        <div class="row gx-3 mt-4" id="form-actions">
+                            <!-- Back Button (Hidden on Step 1) -->
+                            <div class="col-6" id="back-button-col">
+                                <button type="button" id="back-button" class="btn btn-munchies-cream w-100 py-2 rounded-3" style="display: none;">
+                                    Back
+                                </button>
+                            </div>
+
+                            <!-- Next/Finish Button -->
+                            <div class="col-6" id="next-button-col">
+                                <button type="button" id="next-button" class="btn btn-signup w-100 py-2 rounded-3">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Login Link (Only visible on Step 1) -->
+                        <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;" id="login-link-container">
+                            Already ready have an account? <a href="#" style=" text-decoration: none; color: var(--munchies-coral);"><u>Login</u></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Multi-step Form Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentStep = 1;
+        const totalSteps = 4;
+        const stepContents = document.querySelectorAll('.step-content');
+        const nextButton = document.getElementById('next-button');
+        const backButton = document.getElementById('back-button');
+        const backButtonCol = document.getElementById('back-button-col');
+        const nextButtonCol = document.getElementById('next-button-col');
+        const loginLinkContainer = document.getElementById('login-link-container');
+        const form = document.getElementById('multi-step-form');
+
+        // Initial setup
+        updateFormVisibility(currentStep);
+        updateStepIndicator(currentStep);
+
+        // --- Core Logic Functions ---
+
+        function updateFormVisibility(step) {
+            stepContents.forEach((content, index) => {
+                // Show only the current step's content
+                content.style.display = (index + 1) === step ? 'block' : 'none';
+            });
+
+            // Handle button visibility and text
+            if (step === 1) {
+                backButton.style.display = 'none';
+                backButtonCol.classList.remove('col-6');
+                backButtonCol.classList.add('col-0');
+                nextButtonCol.classList.remove('col-6');
+                nextButtonCol.classList.add('col-12');
+                nextButton.textContent = 'Sign Up';
+                loginLinkContainer.style.display = 'block';
+            } else {
+                backButton.style.display = 'block';
+                backButtonCol.classList.add('col-6');
+                backButtonCol.classList.remove('col-0');
+                nextButtonCol.classList.add('col-6');
+                nextButtonCol.classList.remove('col-12');
+                loginLinkContainer.style.display = 'none';
+            }
+
+            if (step === totalSteps) {
+                nextButton.textContent = 'Finish';
+                nextButton.classList.remove('btn-signup');
+                nextButton.classList.add('btn-munchies-green');
+            } else {
+                nextButton.textContent = 'Next';
+                nextButton.classList.add('btn-signup');
+                nextButton.classList.remove('btn-munchies-green');
+            }
+
+            // Special layout for Step 4 (Confirmation) if needed, but using existing layout for now.
+        }
+
+        function updateStepIndicator(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const circle = document.getElementById(`circle-${i}`);
+                const text = document.getElementById(`text-${i}`);
+
+                circle.classList.remove('completed', 'current');
+                text.classList.remove('current');
+
+                if (i < step) {
+                    circle.classList.add('completed');
+                    circle.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === step) {
+                    circle.classList.add('current');
+                    circle.textContent = i;
+                    text.classList.add('current');
+                } else {
+                    circle.textContent = i;
+                }
+            }
+        }
+
+        // --- Summary Update Function (Mock Data for Step 4) ---
+        function updateSummary() {
+            // Mock data extraction for demonstration
+            const firstName = form.querySelector('input[placeholder="First Name"]').value || "John";
+            const lastName = form.querySelector('input[placeholder="Last Name"]').value || "Doe";
+            const email = form.querySelector('input[placeholder="Email Address"]').value || "john.doe@example.com";
+            const city = form.querySelector('select[aria-label="Select City"]').value ?
+                form.querySelector('select[aria-label="Select City"]').options[form.querySelector('select[aria-label="Select City"]').selectedIndex].textContent : "City Not Set";
+            const street = form.querySelector('input[placeholder="Street Name"]').value || "123 Main St";
+
+            const emailNotif = form.querySelector('#email-notif').checked;
+            const smsNotif = form.querySelector('#sms-notif').checked;
+            let notifSummary = "None";
+            if (emailNotif && smsNotif) { notifSummary = "Email & SMS"; }
+            else if (emailNotif) { notifSummary = "Email Only"; }
+            else if (smsNotif) { notifSummary = "SMS Only"; }
+
+
+            document.getElementById('summary-name').textContent = `${firstName} ${lastName}`;
+            document.getElementById('summary-email').textContent = email;
+            document.getElementById('summary-city').textContent = city;
+            document.getElementById('summary-street').textContent = street;
+            document.getElementById('summary-notifs').textContent = notifSummary;
+        }
+
+        // --- Event Handlers ---
+
+        nextButton.addEventListener('click', () => {
+            // Basic validation check (can be improved)
+            const currentContent = document.getElementById(`step-${currentStep}-content`);
+            const requiredInputs = currentContent.querySelectorAll('[required]');
+            let allValid = true;
+
+            requiredInputs.forEach(input => {
+                if (!input.value) {
+                    input.reportValidity(); // Show native browser error
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                return; // Stop if validation fails
+            }
+
+            if (currentStep < totalSteps) {
+                if (currentStep === totalSteps - 1) {
+                    // Update summary data just before showing the last step
+                    updateSummary();
+                }
+                currentStep++;
+                updateFormVisibility(currentStep);
+                updateStepIndicator(currentStep);
+            } else {
+                // Last step: Form Submission Logic goes here
+                console.log("Form Completed and submitted!");
+                alert("Account created! Redirecting to dashboard (in a real app).");
+                // In a real application, you would perform the final data submission here
+            }
+        });
+
+        backButton.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateFormVisibility(currentStep);
+                updateStepIndicator(currentStep);
+            }
+        });
+
+        // Ensure initial state is correctly set
+        updateFormVisibility(currentStep);
+        updateStepIndicator(currentStep);
+    });
+</script>
+</body>
+</html>

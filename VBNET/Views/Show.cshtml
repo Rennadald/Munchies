@@ -1,0 +1,343 @@
+﻿@using Lunchbox.Models
+@model Order
+@{
+    ViewData["Title"] = $"Order #{Model.OrderId}";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 fw-bold mb-2" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-shopping-bag me-2"></i>Order #@Model.OrderId
+                    </h1>
+                    <p class="text-muted mb-0">Order details and management</p>
+                </div>
+                <div class="text-end">
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle me-3 fs-5"></i>
+                <div class="flex-grow-1">
+                    <p class="mb-0">@TempData["Success"]</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Order Information -->
+        <div class="col-lg-8">
+            <!-- Order Items -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-list me-2"></i>Order Items
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-center">Price</th>
+                                    <th class="text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                @if (item.Item != null)
+                                                {
+                                                    @item.Item.Name
+                                                }
+                                                else if (item.PreMadeMeal != null)
+                                                {
+                                                    @item.PreMadeMeal.MealName
+                                                }
+                                                else
+                                                {
+                                                    <text>Unknown Item</text>
+                                                }
+                                            </strong>
+                                            @if (item.Item != null && !string.IsNullOrEmpty(item.Item.Description))
+                                            {
+                                                <br />
+                                        
+                                                <small class="text-muted">@item.Item.Description</small>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark">
+                                                @if (item.Item != null)
+                                                {
+                                                    <text>Individual</text>
+                                                }
+                                                else
+                                                {
+                                                    <text>Pre-made Meal</text>
+                                                }
+                                            </span>
+                                        </td>
+                                        <td class="text-center">@(item.Quantity ?? 1)</td>
+                                        <td class="text-center">
+                                            @{
+                                                decimal unitPrice = 0;
+                                                if (item.Item != null)
+                                                {
+                                                    unitPrice = item.Item.UnitPrice ?? 0;
+                                                }
+                                                else if (item.PreMadeMeal != null)
+                                                {
+                                                    unitPrice = item.PreMadeMeal.FixedPrice ?? 0;
+                                                }
+                                            }
+                                            SAR @string.Format("{0:N2}", unitPrice)
+                                        </td>
+                                        <td class="text-center fw-bold text-success">
+                                            @{
+                                                decimal itemTotal = unitPrice * (item.Quantity ?? 1);
+                                            }
+                                            SAR @string.Format("{0:N2}", itemTotal)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end fw-bold">Total Amount:</td>
+                                    <td class="text-center fw-bold fs-5 text-success">
+                                        @{
+                                            var orderTotal = Model.TotalAmount ?? 0;
+                                        }
+                                        SAR @string.Format("{0:N2}", orderTotal)
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Order Summary -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-info-circle me-2"></i>Order Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Order Status:</strong>
+                        <span class="badge status-@(Model.DeliveryStatus?.ToLower() ?? "pending") float-end">
+                            @(Model.DeliveryStatus ?? "Pending")
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Order Date:</strong>
+                        <span class="float-end">@(Model.OrderDate?.ToString("MMM dd, yyyy hh:mm tt") ?? "N/A")</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Delivery Date:</strong>
+                        <span class="float-end">@(Model.DeliveryDate?.ToString("MMM dd, yyyy") ?? "N/A")</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Total Items:</strong>
+                        <span class="float-end">@Model.OrderItems.Count</span>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <strong>Total Amount:</strong>
+                        @{
+                            var summaryTotal = Model.TotalAmount ?? 0;
+                        }
+                        <span class="float-end fw-bold text-success">SAR @string.Format("{0:N2}", summaryTotal)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-user me-2"></i>Customer Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Parent:</strong>
+                        <span class="float-end">@(Model.Parent?.FirstName ?? "N/A") @(Model.Parent?.LastName ?? "")</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong>
+                        <span class="float-end">@(Model.Parent?.PhoneNumber ?? "N/A")</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong>
+                        <span class="float-end">@(Model.Parent?.Email ?? "N/A")</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Child:</strong>
+                        <span class="float-end">@(Model.Child?.Name ?? "N/A")</span>
+                    </div>
+                    @if (Model.Package != null)
+                    {
+                        <div class="mb-3">
+                            <strong>Package:</strong>
+                            <span class="float-end">@Model.Package.PackageName</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            @if (Model.Payments != null && Model.Payments.Any())
+            {
+                var payment = Model.Payments.FirstOrDefault();
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-credit-card me-2"></i>Payment Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Payment Method:</strong>
+                            <span class="float-end">@(payment.PaymentMethod ?? "N/A")</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Amount Paid:</strong>
+                            @{
+                                var paymentAmount = payment.Amount ?? 0;
+                            }
+                            <span class="float-end text-success">SAR @string.Format("{0:N2}", paymentAmount)</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Payment Date:</strong>
+                            <span class="float-end">@(payment.PaymentDate?.ToString("MMM dd, yyyy hh:mm tt") ?? "N/A")</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Status:</strong>
+                            <span class="badge bg-success float-end">@(payment.Status ?? "N/A")</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Rating Information -->
+            @if (Model.Ratings != null && Model.Ratings.Any())
+            {
+                var rating = Model.Ratings.FirstOrDefault();
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-star me-2"></i>Customer Rating
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>Rating:</strong>
+                            <div class="float-end">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star @(i <= (rating.RatingStars ?? 0) ? "text-warning" : "text-muted")"></i>
+                                }
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(rating.Comment))
+                        {
+                            <div class="mb-3">
+                                <strong>Comment:</strong>
+                                <p class="mb-0 mt-2 text-muted">@rating.Comment</p>
+                            </div>
+                        }
+                        <div class="mb-3">
+                            <strong>Rated At:</strong>
+                            <span class="float-end">@(rating.RatedAt?.ToString("MMM dd, yyyy hh:mm tt") ?? "N/A")</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --munchies-dark-green: #2e8b57;
+        }
+
+        .status-pending {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+
+        .status-processing {
+            background-color: #17a2b8 !important;
+        }
+
+        .status-delivered {
+            background-color: #28a745 !important;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545 !important;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+            .timeline-item.completed .timeline-marker {
+                background: #28a745 !important;
+            }
+
+        .timeline-marker {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+
+        .timeline-content {
+            padding-left: 10px;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+    </style>
+}

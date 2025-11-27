@@ -1,0 +1,271 @@
+﻿@model Lunchbox.Models.Rating
+@{
+    ViewData["Title"] = "Edit Review";
+}
+
+<div class="container-fluid py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-6 fw-bold gradient-text mb-2">
+                            <i class="fas fa-edit me-2"></i>Edit Review
+                        </h1>
+                        <p class="text-muted">Update your meal review and rating</p>
+                    </div>
+                    <div class="text-end">
+                        <a asp-action="Index" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Reviews
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-star me-2"></i>Edit Your Review
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Order Information -->
+                        <div class="order-info-card mb-4">
+                            <h6 class="fw-bold mb-3">Order Details</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong>Order #:</strong> @Model.Order.OrderId
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Child:</strong> @Model.Order.Child.Name
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Delivery Date:</strong>
+                                        @Model.Order.DeliveryDate?.ToString("MMM dd, yyyy")
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-2">
+                                        <strong>Current Rating:</strong>
+                                        <span class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="fas fa-star @(i <= Model.RatingStars ? "text-warning" : "text-light")"></i>
+                                            }
+                                            (@Model.RatingStars/5)
+                                        </span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Reviewed on:</strong>
+                                        @Model.RatedAt?.ToString("MMM dd, yyyy h:mm tt")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review Form -->
+                        <form asp-action="Update" method="POST">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="RatingId" value="@Model.RatingId" />
+
+                            <!-- Star Rating -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Your Rating *</label>
+                                <div class="star-rating-edit">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <input type="radio" id="star@(i)" name="Rating" value="@i"
+                                               @(i == Model.RatingStars ? "checked" : "") />
+                                        <label for="star@(i)" class="star-label">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                    }
+                                </div>
+                                <span asp-validation-for="RatingStars" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Comment -->
+                            <div class="mb-4">
+                                <label for="Comment" class="form-label fw-bold">Your Review</label>
+                                <textarea class="form-control" id="Comment" name="Comment" rows="5"
+                                          placeholder="Share your experience with this meal... (Optional)">@Model.Comment</textarea>
+                                <div class="form-text">
+                                    Maximum 1000 characters. Your feedback helps us improve!
+                                </div>
+                                <span asp-validation-for="Comment" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteReviewModal">
+                                    <i class="fas fa-trash me-2"></i>Delete Review
+                                </button>
+                                <div>
+                                    <a asp-action="Index" class="btn btn-secondary me-2">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-signup">
+                                        <i class="fas fa-save me-2"></i>Update Review
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Review
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your review for Order #@Model.Order.OrderId?</p>
+                <div class="alert alert-warning mb-0">
+                    <small>
+                        <i class="fas fa-info-circle me-2"></i>
+                        This action cannot be undone. Your rating and comments will be permanently removed.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="Delete" asp-route-id="@Model.RatingId" method="POST">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Delete Review
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, var(--munchies-dark-green) 0%, var(--munchies-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .order-info-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .star-rating-edit {
+            display: flex;
+            gap: 5px;
+            direction: rtl;
+        }
+
+            .star-rating-edit input[type="radio"] {
+                display: none;
+            }
+
+            .star-rating-edit .star-label {
+                font-size: 2rem;
+                color: #e9ecef;
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+                .star-rating-edit .star-label:hover,
+                .star-rating-edit .star-label:hover ~ .star-label,
+                .star-rating-edit input[type="radio"]:checked ~ .star-label {
+                    color: #ffc107;
+                }
+
+            .star-rating-edit input[type="radio"]:checked + .star-label {
+                color: #ffc107;
+            }
+
+        .btn-signup {
+            background: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.3s;
+        }
+
+            .btn-signup:hover {
+                background: #e06d48;
+                color: white;
+            }
+
+        .form-control:focus {
+            border-color: var(--munchies-green);
+            box-shadow: 0 0 0 0.2rem rgba(166, 178, 139, 0.25);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const starLabels = document.querySelectorAll('.star-label');
+
+            starLabels.forEach(label => {
+                label.addEventListener('click', function() {
+                    const radio = this.previousElementSibling;
+                    radio.checked = true;
+
+                    starLabels.forEach(star => {
+                        star.style.color = '#e9ecef';
+                    });
+
+                    let current = this;
+                    while (current) {
+                        current.style.color = '#ffc107';
+                        current = current.nextElementSibling;
+                    }
+                });
+
+                label.addEventListener('mouseenter', function() {
+                    let current = this;
+                    while (current) {
+                        current.style.color = '#ffc107';
+                        current = current.nextElementSibling;
+                    }
+                });
+            });
+
+            document.querySelector('.star-rating-edit').addEventListener('mouseleave', function() {
+                const checkedRadio = this.querySelector('input[type="radio"]:checked');
+                starLabels.forEach(star => {
+                    star.style.color = '#e9ecef';
+                });
+
+                if (checkedRadio) {
+                    let current = checkedRadio.nextElementSibling;
+                    while (current) {
+                        current.style.color = '#ffc107';
+                        current = current.nextElementSibling;
+                    }
+                }
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

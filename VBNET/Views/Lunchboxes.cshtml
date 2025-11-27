@@ -1,0 +1,455 @@
+﻿@model List<Lunchbox.ViewModels.MealWithRatingViewModel>
+
+@{
+    ViewData["Title"] = "Lunchboxes";
+}
+
+<div class="container-fluid py-5" style="background-color: #F9F6F3; min-height: 100vh;">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold" style="color: var(--munchies-dark-green);">Lunchboxes Library</h1>
+                <p class="lead text-muted">Discover our delicious and nutritious meal options for your little ones</p>
+
+                <!-- Custom Meal Link -->
+                <div class="mt-4">
+                    <p class="text-muted mb-3">Not finding what you're looking for?</p>
+                    <a asp-controller="CustomMeal" asp-action="Create" class="btn btn-outline-primary">
+                        <i class="fas fa-utensils me-2"></i>Create Your Own Lunchbox
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="search-box">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="mealSearch" placeholder="Search meals by name...">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="sortSelect">
+                    <option value="name">Sort by Name</option>
+                    <option value="price_low">Price: Low to High</option>
+                    <option value="price_high">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Meal Count -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <p class="text-muted mb-0">
+                    Showing <span class="fw-bold text-dark" id="mealCount">@Model.Count</span>
+                    <span id="mealText">@(Model.Count == 1 ? "meal" : "meals")</span> available
+                </p>
+            </div>
+        </div>
+
+        <!-- Meals Grid -->
+        <div class="row g-4" id="mealsContainer">
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var mealData in Model)
+                {
+                    var meal = mealData.Meal;
+                    var avgRating = mealData.AverageRating;
+                    var totalRatingCount = mealData.RatingCount;
+
+                    <div class="col-xl-3 col-lg-4 col-md-6 meal-card"
+                         data-name="@meal.MealName.ToLower()"
+                         data-price="@meal.FixedPrice"
+                         data-rating="@avgRating">
+                        <div class="card h-100 shadow-sm border-0 meal-card-inner">
+                            <!-- Meal Image -->
+                            <div class="position-relative">
+                                <img src="@meal.ImageUrl"
+                                     class="card-img-top"
+                                     alt="@meal.MealName"
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.onerror=null; this.src='~/images/fallback-meal.png';">
+
+                                <!-- Rating Badge -->
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <div class="bg-white rounded-pill px-3 py-1 shadow-sm">
+                                        <i class="fas fa-star text-warning me-1"></i>
+                                        <span class="fw-bold text-dark">@avgRating.ToString("N1")</span>
+                                        <small class="text-muted">(@totalRatingCount)</small>
+                                    </div>
+                                </div>
+
+                                <!-- Availability Badge -->
+                                <div class="position-absolute top-0 start-0 m-3">
+                                    @if (meal.IsAvailable == true)
+                                    {
+                                        <span class="badge bg-success">Available</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Out of Stock</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold" style="color: var(--munchies-dark-green);">
+                                    @meal.MealName
+                                </h5>
+
+                                <!-- Ingredients Preview -->
+                                @if (meal.Items != null && meal.Items.Count > 0)
+                                {
+                                    <div class="mb-3">
+                                        <small class="text-muted fw-semibold">Contains:</small>
+                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                            @{
+                                                int itemCount = 0;
+                                                foreach (var item in meal.Items)
+                                                {
+                                                    if (itemCount < 3)
+                                                    {
+                                                        <span class="badge bg-light text-dark border">
+                                                            @item.Name
+                                                        </span>
+                                                        itemCount++;
+                                                    }
+                                                }
+                                            }
+                                            @if (meal.Items.Count > 3)
+                                            {
+                                                <span class="badge bg-light text-muted border">
+                                                    +@(meal.Items.Count - 3) more
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Price and Action -->
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <div>
+                                        <h4 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                                            SAR @meal.FixedPrice?.ToString("N2")
+                                        </h4>
+                                        <small class="text-muted">per meal</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="card-footer bg-transparent border-top-0">
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#mealModal@(meal.PreMadeMealId)">
+                                        <i class="fas fa-eye me-1"></i> Quick View
+                                    </button>
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <form asp-controller="Cart" asp-action="Add" method="POST">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="meal_id" value="@meal.PreMadeMealId">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-order-meal">
+                                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Auth" asp-action="Login" class="btn btn-order-meal">
+                                            <i class="fas fa-shopping-cart me-1"></i> Add to Cart
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meal Modal -->
+                    <div class="modal fade" id="mealModal@(meal.PreMadeMealId)" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title fw-bold" style="color: var(--munchies-dark-green);">
+                                        @meal.MealName
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <img src="@meal.ImageUrl"
+                                                 class="img-fluid rounded"
+                                                 alt="@meal.MealName"
+                                                 onerror="this.onerror=null; this.src='~/images/fallback-meal.png';">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="rating-display">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        @if (i <= Math.Floor(avgRating))
+                                                        {
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        }
+                                                        else if (i - 0.5 <= avgRating)
+                                                        {
+                                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-star text-warning"></i>
+                                                        }
+                                                    }
+                                                    <span class="ms-2 fw-bold">@avgRating.ToString("N1")</span>
+                                                    <small class="text-muted">(@totalRatingCount reviews)</small>
+                                                </div>
+                                            </div>
+
+                                            <p class="text-muted mb-4">@meal.MealDescription</p>
+
+                                            @if (meal.Items != null && meal.Items.Count > 0)
+                                            {
+                                                <div class="mb-4">
+                                                    <h6 class="fw-bold" style="color: var(--munchies-dark-green);">Ingredients:</h6>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @foreach (var item in meal.Items)
+                                                        {
+                                                            <span class="badge bg-light text-dark border">
+                                                                @item.Name
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <h6 class="fw-bold" style="color: var(--munchies-dark-green);">Nutrition Facts:</h6>
+                                                    @{
+                                                        int totalCal = 0;
+                                                        decimal totalPro = 0;
+                                                        decimal totalCarb = 0;
+                                                        decimal totalFt = 0;
+
+                                                        foreach (var item in meal.Items)
+                                                        {
+                                                            totalCal += item.Calories ?? 0;
+                                                            totalPro += item.ProteinG ?? 0;
+                                                            totalCarb += item.CarbsG ?? 0;
+                                                            totalFt += item.FatG ?? 0;
+                                                        }
+                                                    }
+                                                    <div class="row text-center">
+                                                        <div class="col-3 border-end">
+                                                            <div class="fw-bold text-dark">@totalCal</div>
+                                                            <small class="text-muted">Calories</small>
+                                                        </div>
+                                                        <div class="col-3 border-end">
+                                                            <div class="fw-bold text-dark">@Math.Round(totalPro, 0)g</div>
+                                                            <small class="text-muted">Protein</small>
+                                                        </div>
+                                                        <div class="col-3 border-end">
+                                                            <div class="fw-bold text-dark">@Math.Round(totalCarb, 0)g</div>
+                                                            <small class="text-muted">Carbs</small>
+                                                        </div>
+                                                        <div class="col-3">
+                                                            <div class="fw-bold text-dark">@Math.Round(totalFt, 0)g</div>
+                                                            <small class="text-muted">Fat</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h4 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                                                        SAR @meal.FixedPrice?.ToString("N2")
+                                                    </h4>
+                                                    <small class="text-muted">per meal</small>
+                                                </div>
+                                                @if (User.Identity.IsAuthenticated)
+                                                {
+                                                    <form asp-controller="Cart" asp-action="Add" method="POST">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="meal_id" value="@meal.PreMadeMealId">
+                                                        <input type="hidden" name="quantity" value="1">
+                                                        <button type="submit" class="btn btn-order-meal-lg">
+                                                            <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-controller="Auth" asp-action="Login" class="btn btn-order-meal-lg">
+                                                        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                        <h4 style="color: var(--munchies-dark-green);">No Meals Available</h4>
+                        <p class="text-muted">We're currently preparing new delicious meals. Please check back later!</p>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-order-meal">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .meal-card-inner {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .meal-card-inner:hover {
+                transform: translateY(-5px);
+                border-color: var(--munchies-green);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+            }
+
+        .btn-order-meal {
+            background-color: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+            .btn-order-meal:hover {
+                background-color: #e06d48;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .btn-order-meal-lg {
+            background-color: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .btn-order-meal-lg:hover {
+                background-color: #e06d48;
+                color: white;
+            }
+
+        .search-box .input-group-text {
+            border-radius: 0.5rem 0 0 0.5rem;
+            border-right: none;
+        }
+
+        .search-box .form-control {
+            border-radius: 0 0.5rem 0.5rem 0;
+            border-left: none;
+        }
+
+        .rating-display {
+            font-size: 1.1rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mealSearch = document.getElementById('mealSearch');
+            const sortSelect = document.getElementById('sortSelect');
+            const mealsContainer = document.getElementById('mealsContainer');
+            const mealCards = document.querySelectorAll('.meal-card');
+            const mealCount = document.getElementById('mealCount');
+            const mealText = document.getElementById('mealText');
+
+            function updateMealCount() {
+                const visibleCards = Array.from(mealCards).filter(card => card.style.display !== 'none');
+                const count = visibleCards.length;
+                mealCount.textContent = count;
+                mealText.textContent = count === 1 ? 'meal' : 'meals';
+            }
+
+            mealSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+
+                mealCards.forEach(card => {
+                    const mealName = card.getAttribute('data-name');
+                    if (mealName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                updateMealCount();
+            });
+
+            sortSelect.addEventListener('change', function() {
+                const sortBy = this.value;
+                const cardsArray = Array.from(mealCards);
+
+                cardsArray.sort((a, b) => {
+                    switch(sortBy) {
+                        case 'name':
+                            return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                        case 'price_low':
+                            return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                        case 'price_high':
+                            return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                        case 'rating':
+                            return parseFloat(b.getAttribute('data-rating')) - parseFloat(a.getAttribute('data-rating'));
+                        default:
+                            return 0;
+                    }
+                });
+
+                cardsArray.forEach(card => {
+                    mealsContainer.appendChild(card);
+                });
+            });
+        });
+    </script>
+}

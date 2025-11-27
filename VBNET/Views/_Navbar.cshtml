@@ -1,0 +1,149 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<nav class="navbar navbar-expand-lg bg-white sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center fw-bolder" asp-controller="Home" asp-action="Index" style="color: var(--munchies-dark-green);">
+            <img src="~/images/logo.png" alt="Munchies Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fs-6 fw-semibold">
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "activeNavigation" : "")"
+                       asp-controller="Home" asp-action="Index" style="color: var(--munchies-dark-green);">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Lunchboxes" ? "activeNavigation" : "")"
+                       asp-controller="Home" asp-action="Lunchboxes" style="color: var(--munchies-dark-green);">Lunchboxes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Create" && ViewContext.RouteData.Values["controller"]?.ToString() == "CustomMeal" ? "activeNavigation" : "")"
+                       asp-controller="CustomMeal" asp-action="Create" style="color: var(--munchies-dark-green);">Build Lunchbox</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Packages" ? "activeNavigation" : "")"
+                       asp-controller="Home" asp-action="Packages" style="color: var(--munchies-dark-green);">Packages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Contact" ? "activeNavigation" : "")"
+                       asp-controller="Home" asp-action="Contact" style="color: var(--munchies-dark-green);">Contact Us</a>
+                </li>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @if (User.IsInRole("parent"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["controller"]?.ToString() == "Parent" ? "activeNavigation" : "")"
+                               asp-controller="Parent" asp-action="Dashboard" style="color: var(--munchies-dark-green);">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "History" && ViewContext.RouteData.Values["controller"]?.ToString() == "Order" ? "activeNavigation" : "")"
+                               asp-controller="Order" asp-action="History" style="color: var(--munchies-dark-green);">My Orders</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "activeNavigation" : "")"
+                               asp-controller="Admin" asp-action="Dashboard" style="color: var(--munchies-dark-green);">Admin Dashboard</a>
+                        </li>
+                    }
+                }
+            </ul>
+            <div class="d-flex gap-3 mt-3 mt-lg-0">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <!-- Cart Icon with Count -->
+                    <a asp-controller="Cart" asp-action="View" class="btn btn-signin position-relative me-2">
+                        <i class="fas fa-shopping-cart me-1"></i> Cart
+                        @{
+                            var cart = HttpContextAccessor.HttpContext.Session.GetString("cart");
+                            var cartCount = 0;
+                            if (!string.IsNullOrEmpty(cart))
+                            {
+                                var cartItems = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(cart);
+                                cartCount = cartItems?.Count ?? 0;
+                            }
+                        }
+                        @if (cartCount > 0)
+                        {
+                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @cartCount
+                            </span>
+                        }
+                        else
+                        {
+                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                                0
+                            </span>
+                        }
+                    </a>
+
+                    <a asp-controller="Favorites" asp-action="Index" class="btn btn-signin position-relative me-2">
+                        <i class="fas fa-heart me-1 text-danger"></i>
+                    </a>
+
+                    <!-- User Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-signup dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i> @User.Identity.Name
+                        </button>
+                        <ul class="dropdown-menu">
+                            @if (User.IsInRole("parent"))
+                            {
+                                <li><a class="dropdown-item" asp-controller="Parent" asp-action="Dashboard"><i class="fas fa-home me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-controller="Child" asp-action="Index"><i class="fas fa-child me-2"></i>My Children</a></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Order" asp-action="History">
+                                        <i class="fas fa-history me-2"></i>Orders History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Review" asp-action="Index">
+                                        <i class="fas fa-star me-2"></i>Reviews History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Parent" asp-action="Profile">
+                                        <i class="fas fa-user-edit me-2"></i>My Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            }
+
+                            @if (User.IsInRole("admin"))
+                            {
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                        <i class="fas fa-cog me-2"></i>Admin Dashboard
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            }
+
+                            <li>
+                                <form method="POST" asp-action="Logout" asp-controller="Auth" id="logout-form">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <!-- Guest Menu -->
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-signin">Sign In</a>
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-signup">Sign Up</a>
+                }
+            </div>
+        </div>
+    </div>
+</nav>

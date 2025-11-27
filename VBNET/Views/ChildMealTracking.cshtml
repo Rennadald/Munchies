@@ -1,0 +1,224 @@
+﻿@model Lunchbox.Models.Child
+@{
+    ViewData["Title"] = $"{Model.Name}'s Meal Schedule";
+    var child = Model;
+    var weekDays = ViewBag.WeekDays as List<DateTime>;
+    var mealsByDate = ViewBag.MealsByDate as Dictionary<string, List<Lunchbox.Models.Order>>;
+    var startDate = weekDays?.FirstOrDefault() ?? DateTime.Today;
+    var endDate = weekDays?.LastOrDefault() ?? DateTime.Today;
+}
+
+<div class="container-fluid py-4">
+    <div class="container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-6 fw-bold gradient-text mb-2">
+                            <i class="fas fa-calendar-day me-2"></i>@child.Name's Meal Schedule
+                        </h1>
+                        <p class="text-muted">Detailed meal tracking for @child.Name</p>
+                    </div>
+                    <div class="text-end">
+                        <a asp-controller="Parent" asp-action="MealTracking" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Overview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Range -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <h5 class="fw-bold mb-0 text-primary">
+                            @startDate.ToString("MMMM d, yyyy") - @endDate.ToString("MMMM d, yyyy")
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="row">
+            @if (weekDays != null)
+            {
+                @foreach (var day in weekDays)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0 text-center">
+                                    <i class="fas fa-calendar-day me-2"></i>@day.ToString("dddd")
+                                </h6>
+                                <p class="text-muted text-center mb-0 small">@day.ToString("MMMM d, yyyy")</p>
+                            </div>
+                            <div class="card-body">
+                                @{
+                                    var dateKey = day.ToString("yyyy-MM-dd");
+                                    var dayOrders = mealsByDate != null && mealsByDate.ContainsKey(dateKey) ? mealsByDate[dateKey] : new List<Lunchbox.Models.Order>();
+                                }
+
+                                @if (dayOrders.Any())
+                                {
+                                    @foreach (var order in dayOrders)
+                                    {
+                                        <div class="meal-card mb-3">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge status-@(order.DeliveryStatus?.ToLower())">
+                                                    @order.DeliveryStatus
+                                                </span>
+                                                <small class="text-muted">
+                                                    @{
+                                                        var timeDisplay = "";
+                                                        if (order.DeliveryDate != null && order.DeliveryDate.HasValue)
+                                                        {
+                                                            timeDisplay = order.DeliveryDate.Value.ToString("h:mm tt");
+                                                        }
+                                                    }
+                                                    @timeDisplay
+                                                </small>
+                                            </div>
+
+                                            <h6 class="fw-bold mb-2">@(order.Package?.PackageName ?? "Custom Meal")</h6>
+
+                                            <!-- Meal Items -->
+                                            <div class="meal-items mb-2">
+                                                @foreach (var orderItem in order.OrderItems)
+                                                {
+                                                    <div class="meal-item d-flex justify-content-between align-items-center py-1 border-bottom">
+                                                        <small>
+                                                            @if (orderItem.Item != null)
+                                                            {
+                                                                @orderItem.Item.Name
+                                                            }
+                                                            else if (orderItem.PreMadeMeal != null)
+                                                            {
+                                                                @orderItem.PreMadeMeal.MealName
+                                                            }
+                                                            <span class="text-muted">x@orderItem.Quantity</span>
+                                                        </small>
+                                                        <small class="text-success fw-bold">
+                                                            @{
+                                                                decimal itemPrice = orderItem.Item?.UnitPrice ?? orderItem.PreMadeMeal?.FixedPrice ?? 0;
+                                                                decimal itemTotal = itemPrice * orderItem.Quantity ?? 1;
+                                                                string itemTotalFormatted = itemTotal.ToString("N2");
+                                                            }
+                                                            SAR @itemTotalFormatted
+                                                        </small>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <!-- Order Total -->
+                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                <small class="fw-bold">Total:</small>
+                                                <span class="fw-bold text-success">
+                                                    @{
+                                                        string orderTotalFormatted = order.TotalAmount?.ToString("N2");
+                                                    }
+                                                    SAR @orderTotalFormatted
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-utensils fa-2x text-muted mb-3"></i>
+                                        <p class="text-muted mb-0">No meals scheduled</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- No Meals Message -->
+        @if (mealsByDate == null || !mealsByDate.Any())
+        {
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Meals Scheduled</h4>
+                            <p class="text-muted mb-4">@child.Name doesn't have any meals scheduled for this period.</p>
+                            <a asp-controller="Home" asp-action="Lunchboxes" class="btn btn-signup">
+                                <i class="fas fa-utensils me-2"></i>Order Meals
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, var(--munchies-dark-green) 0%, var(--munchies-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .meal-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .meal-items {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .meal-item {
+            font-size: 0.85rem;
+        }
+
+        .btn-signup {
+            background: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.3s;
+        }
+
+            .btn-signup:hover {
+                background: #e06d48;
+                color: white;
+            }
+    </style>
+}

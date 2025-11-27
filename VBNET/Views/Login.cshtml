@@ -1,0 +1,121 @@
+﻿@model Lunchbox.ViewModels.Auth.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css">
+}
+
+<div class="content-wrapper">
+    <!-- Main Content Grid -->
+    <div class="container-fluid d-flex py-5" style="min-height: calc(100vh - 70px);">
+        <div class="row w-100 align-items-center">
+            <div class="col-lg-7 d-flex align-items-center justify-content-center position-relative">
+                <div class="marketing-text text-start ms-lg-5 ps-lg-5 w-75">
+                    <div class="accent-bar d-none d-lg-block"></div>
+                    <h1 style="color: var(--munchies-dark-green)" class="mb-3">Welcome Back!</h1>
+                    <p class="mb-0">Great to see you again! Sign in to continue managing your kid's lunchboxes.</p>
+                </div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div class="col-lg-5 d-flex align-items-center py-5 py-lg-0">
+                <div class="form-card w-100">
+                    <div class="text-center mb-4">
+                        <h2 style="color: var(--munchies-dark-green);">Sign In</h2>
+                        <p class="text-muted">Enter your credentials to access your account</p>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["Success"]
+                        </div>
+                    }
+
+                    <form method="POST" asp-action="Login" asp-controller="Auth">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <input type="email" class="form-control" asp-for="Email" placeholder="Email Address" required>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <div class="input-group">
+                                <input type="password" class="form-control" asp-for="Password" placeholder="Password" required id="login-password">
+                                <span class="input-group-text bg-white toggle-password" style="cursor: pointer;">
+                                    <i class="fas fa-eye-slash text-muted"></i>
+                                </span>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="RememberMe" id="remember">
+                                <label class="form-check-label" for="remember" style="color: var(--munchies-dark-green);">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="#" style="text-decoration: none; color: var(--munchies-coral);">
+                                <small><u>Forgot password?</u></small>
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-signup w-100 py-2 rounded-3 mb-3">
+                            Sign In
+                        </button>
+
+                        <!-- Register Link -->
+                        <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;">
+                            Don't have an account?
+                            <a asp-action="Register" asp-controller="Auth" style="text-decoration: none; color: var(--munchies-coral);">
+                                <u>Sign up here</u>
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Password visibility toggle
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

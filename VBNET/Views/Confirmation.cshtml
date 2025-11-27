@@ -1,0 +1,258 @@
+﻿@model Lunchbox.Models.Order
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Alert -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Confirmation Card -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <div class="success-icon mb-4">
+                            <i class="fas fa-check-circle fa-5x" style="color: var(--munchies-green);"></i>
+                        </div>
+                        <h1 class="fw-bold" style="color: var(--munchies-dark-green);">Order Confirmed!</h1>
+                        <p class="lead text-muted">Thank you for your order. We're preparing your meals with care.</p>
+                        <div class="badge bg-success fs-6 px-3 py-2">
+                            Order #@Model.OrderId
+                        </div>
+                    </div>
+
+                    <!-- Order Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0" style="background-color: var(--munchies-light-green);">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">
+                                        <i class="fas fa-child me-2"></i>Order For
+                                    </h6>
+                                    @if (Model.Child != null)
+                                    {
+                                        var childAge = DateTime.Now.Year - Model.Child.DateOfBirth.Year;
+                                        if (DateTime.Now.DayOfYear < Model.Child.DateOfBirth.DayOfYear)
+                                        {
+                                            childAge--;
+                                        }
+                                        <p class="mb-1 fw-bold">@Model.Child.Name</p>
+                                        <p class="text-muted small mb-0">Age: @childAge years</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0" style="background-color: var(--munchies-light-green);">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">
+                                        <i class="fas fa-truck me-2"></i>Delivery Info
+                                    </h6>
+                                    @if (Model.DeliveryDate.HasValue)
+                                    {
+                                        <p class="mb-1 fw-bold">
+                                            @Model.DeliveryDate.Value.ToString("MMM dd, yyyy")
+                                        </p>
+                                    }
+                                    <p class="text-muted small mb-0">
+                                        Status: <span class="badge bg-warning">@Model.DeliveryStatus</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="card border-0 mb-4" style="background-color: #f8f9fa;">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">
+                                <i class="fas fa-utensils me-2"></i>Order Items
+                            </h6>
+                            @if (Model.OrderItems != null && Model.OrderItems.Any())
+                            {
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <div class="row align-items-center mb-3 pb-3 border-bottom">
+                                        <div class="col-2">
+                                            @if (item.PreMadeMeal != null && !string.IsNullOrEmpty(item.PreMadeMeal.ImageUrl))
+                                            {
+                                                <img src="@item.PreMadeMeal.ImageUrl"
+                                                     alt="@item.PreMadeMeal.MealName"
+                                                     class="img-fluid rounded"
+                                                     style="height: 50px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                     style="height: 50px; width: 50px;">
+                                                    <i class="fas fa-utensils text-muted"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="col-6">
+                                            <h6 class="fw-bold mb-1">
+                                                @if (item.PreMadeMeal != null)
+                                                {
+                                                    @item.PreMadeMeal.MealName
+                                                }
+                                                else if (item.Item != null)
+                                                {
+                                                    @item.Item.Name
+                                                }
+                                                else
+                                                {
+                                                    @:Meal Item
+                                                }
+                                            </h6>
+                                            <small class="text-muted">Qty: @(item.Quantity ?? 1)</small>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            @if (item.PreMadeMeal != null)
+                                            {
+                                                var itemTotal = (item.PreMadeMeal.FixedPrice ?? 0) * (item.Quantity ?? 1);
+                                                <span class="fw-bold">SAR @itemTotal.ToString("N2")</span>
+                                            }
+                                            else if (item.Item != null)
+                                            {
+                                                var itemTotal = (item.Item.UnitPrice ?? 0) * (item.Quantity ?? 1);
+                                                <span class="fw-bold">SAR @itemTotal.ToString("N2")</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary -->
+                    <div class="card border-0" style="background-color: var(--munchies-light-green);">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">
+                                <i class="fas fa-receipt me-2"></i>Payment Summary
+                            </h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Subtotal:</strong>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong>SAR @((Model.TotalAmount ?? 0).ToString("N2"))</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Delivery:</strong>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong>FREE</strong>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong class="fs-5">Total Paid:</strong>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong class="fs-5" style="color: var(--munchies-dark-green);">
+                                        SAR @((Model.TotalAmount ?? 0).ToString("N2"))
+                                    </strong>
+                                </div>
+                            </div>
+                            @if (Model.Payments != null && Model.Payments.Any())
+                            {
+                                var payment = Model.Payments.First();
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            Payment Method:
+                                            <span class="fw-bold text-capitalize">@payment.PaymentMethod</span>
+                                            | Status:
+                                            <span class="badge @(payment.Status == "Completed" ? "bg-success" : "bg-warning")">
+                                                @payment.Status
+                                            </span>
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-5">
+                        <div class="d-grid gap-2 d-md-flex justify-content-center">
+                            <a asp-controller="Order" asp-action="Index" class="btn btn-order-meal">
+                                <i class="fas fa-history me-2"></i>View Order History
+                            </a>
+                            <a asp-controller="Home" asp-action="Lunchboxes" class="btn btn-outline-secondary">
+                                <i class="fas fa-utensils me-2"></i>Order More Meals
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Support Info -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted small">
+                            Need help? <a asp-controller="Home" asp-action="Contact" style="color: var(--munchies-coral);">Contact our support team</a>
+                            <br>
+                            We'll send you delivery updates via email and SMS.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --munchies-dark-green: #2d5016;
+            --munchies-green: #5a8f3a;
+            --munchies-light-green: #a6b28b;
+            --munchies-coral: #ff6b6b;
+        }
+
+        .success-icon {
+            animation: bounce 1s ease-in-out;
+        }
+
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .btn-order-meal {
+            background-color: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .btn-order-meal:hover {
+                background-color: #e06d48;
+                color: white;
+                transform: translateY(-2px);
+            }
+    </style>
+}

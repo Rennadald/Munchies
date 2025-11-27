@@ -1,0 +1,239 @@
+﻿@using Lunchbox.Controllers
+@* 
+@using Lunchbox.Models
+@using System.Text.Json *@
+
+@model dynamic
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var cart = ViewBag.Cart as Dictionary<string, CartItem>;
+    var total = ViewBag.Total as decimal? ?? 0;
+    var children = ViewBag.Children as List<Lunchbox.Models.Child>;
+    var selectedChild = ViewBag.SelectedChild as Lunchbox.Models.Child;
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="fw-bold" style="color: var(--munchies-dark-green);">Shopping Cart</h1>
+        </div>
+    </div>
+
+    @if (cart != null && cart.Count > 0)
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Child Selection Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-child me-2"></i>Select Child for This Order
+                        </h5>
+                        <form asp-controller="Cart" asp-action="UpdateChild" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <select name="ChildId" class="form-select" required>
+                                        <option value="">-- Select Child --</option>
+                                        @if (children != null)
+                                        {
+                                            @foreach (var child in children)
+                                            {
+                                                var age = DateTime.Now.Year - child.DateOfBirth.Year;
+                                                var isSelected = selectedChild != null && selectedChild.ChildId == child.ChildId;
+                                                <option value="@child.ChildId" selected="@isSelected">
+                                                    @child.Name (@age years old)
+                                                    @if (child.Allergies != null && child.Allergies.Any())
+                                                    {
+                                                        @: - Allergies: @string.Join(", ", child.Allergies.Select(a => a.AllergyType))
+                                                    }
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn w-100"
+                                            style="background-color: var(--munchies-green); color: white;">
+                                        <i class="fas fa-check me-1"></i> Confirm Child
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        @if (selectedChild != null)
+                        {
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Order will be for: <strong>@selectedChild.Name</strong>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Cart Items -->
+                @foreach (var cartEntry in cart)
+                {
+                    var key = cartEntry.Key;
+                    var item = cartEntry.Value;
+                    var itemTotal = item.Price * item.Quantity;
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    @if (!string.IsNullOrEmpty(item.Image))
+                                    {
+                                        <img src="@item.Image" alt="@item.Name" class="img-fluid rounded" style="height: 80px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <img src="/images/placeholder.jpg" alt="@item.Name" class="img-fluid rounded" style="height: 80px; object-fit: cover;">
+                                    }
+                                </div>
+                                <div class="col-md-5">
+                                    <h5 class="fw-bold" style="color: var(--munchies-dark-green);">@item.Name</h5>
+                                    @if (!string.IsNullOrEmpty(item.Description))
+                                    {
+                                        var shortDesc = item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description;
+                                        <p class="text-muted mb-0 small">@shortDesc</p>
+                                    }
+                                </div>
+                                <div class="col-md-2">
+                                    <h5 class="fw-bold">SAR @item.Price.ToString("N2")</h5>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <form asp-controller="Cart" asp-action="Update" method="post" class="d-flex align-items-center">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="CartKey" value="@key" />
+                                            <button type="submit" name="Action" value="decrease"
+                                                    class="btn btn-sm btn-outline-secondary @(item.Quantity <= 1 ? "disabled" : "")"
+                                                    disabled="@(item.Quantity <= 1)">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <span class="mx-3 fw-bold">@item.Quantity</span>
+                                            <button type="submit" name="Action" value="increase"
+                                                    class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </form>
+                                        <form asp-controller="Cart" asp-action="Remove" method="post" class="ms-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="cartKey" value="@key" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="text-end mt-2">
+                                        <small class="text-muted">
+                                            Total: SAR @itemTotal.ToString("N2")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Clear Cart -->
+                <div class="text-end mb-4">
+                    <form asp-controller="Cart" asp-action="Clear" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i> Clear Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top: 100px;">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-4" style="color: var(--munchies-dark-green);">Order Summary</h5>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Subtotal (@cart.Sum(c => c.Value.Quantity) items):</span>
+                            <span class="fw-bold">SAR @total.ToString("N2")</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Delivery Fee:</span>
+                            <span class="fw-bold">FREE</span>
+                        </div>
+
+                        @if (selectedChild != null)
+                        {
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>For Child:</span>
+                                <span class="fw-bold text-success">@selectedChild.Name</span>
+                            </div>
+                        }
+
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold">Total Amount:</span>
+                            <span class="fw-bold fs-5" style="color: var(--munchies-dark-green);">
+                                SAR @total.ToString("N2")
+                            </span>
+                        </div>
+
+                        @if (selectedChild != null)
+                        {
+                            <a asp-controller="Cart" asp-action="Checkout" class="btn w-100 mb-3"
+                               style="background-color: var(--munchies-coral); color: white;">
+                                <i class="fas fa-credit-card me-2"></i> Proceed to Checkout
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn w-100 mb-3" disabled
+                                    style="background-color: var(--munchies-coral); color: white; opacity: 0.6;">
+                                <i class="fas fa-exclamation-circle me-2"></i> Select a Child First
+                            </button>
+                        }
+
+                        <a asp-controller="Home" asp-action="Lunchboxes" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h4 style="color: var(--munchies-dark-green);">Your cart is empty</h4>
+                <p class="text-muted">Add some delicious meals to get started!</p>
+                <a asp-controller="Home" asp-action="Lunchboxes" class="btn"
+                   style="background-color: var(--munchies-coral); color: white;">
+                    <i class="fas fa-utensils me-2"></i> Browse Meals
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .sticky-top {
+            position: -webkit-sticky;
+            position: sticky;
+            z-index: 100;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+        }
+
+        :root {
+            --munchies-dark-green: #2d5016;
+            --munchies-green: #5a8f3a;
+            --munchies-coral: #ff6b6b;
+        }
+    </style>
+}

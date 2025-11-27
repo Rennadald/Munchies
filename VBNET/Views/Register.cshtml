@@ -1,0 +1,388 @@
+﻿@model Lunchbox.ViewModels.Auth.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+<div class="content-wrapper">
+    <div class="container-fluid d-flex py-5" style="min-height: calc(100vh - 70px);">
+        <div class="row w-100 align-items-center">
+            <div class="col-lg-7 d-flex align-items-center justify-content-center position-relative">
+                <div class="marketing-text text-start ms-lg-5 ps-lg-5 w-75">
+                    <div class="accent-bar d-none d-lg-block"></div>
+                    <h1 style="color: var(--munchies-dark-green)" class="mb-3">Welcome To Munchies</h1>
+                    <p class="mb-0">Where we make planning your kid's lunchbox easy for you.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-5 d-flex align-items-center py-5 py-lg-0">
+                <div class="form-card w-100">
+                    <!-- STEP INDICATOR -->
+                    <div class="step-indicator" id="step-indicator">
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-1">1</div>
+                            <div class="step-text" id="text-1">Account</div>
+                        </div>
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-2">2</div>
+                            <div class="step-text" id="text-2">Address</div>
+                        </div>
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-3">3</div>
+                            <div class="step-text" id="text-3">Notifications</div>
+                        </div>
+                        <div class="step-text-wrap">
+                            <div class="step-circle" id="circle-4">4</div>
+                            <div class="step-text" id="text-4">Confirmation</div>
+                        </div>
+                    </div>
+
+                    <form id="multi-step-form" method="POST" asp-action="Register" asp-controller="Auth">
+                        @Html.AntiForgeryToken()
+
+                        <!-- STEP 1: ACCOUNT DETAILS -->
+                        <div id="step-1-content" class="step-content">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Create Account</h3>
+
+                            <div class="row mb-3 gx-3">
+                                <div class="col-6">
+                                    <input type="text" class="form-control" asp-for="FirstName" placeholder="First Name" required>
+                                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control" asp-for="LastName" placeholder="Last Name" required>
+                                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="email" class="form-control" asp-for="Email" placeholder="Email Address" required>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="tel" class="form-control" asp-for="PhoneNumber" placeholder="Phone Number" required>
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" asp-for="Password" placeholder="Password" required id="password">
+                                    <span class="input-group-text bg-white toggle-password" style="cursor: pointer;">
+                                        <i class="fas fa-eye-slash text-muted"></i>
+                                    </span>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" asp-for="ConfirmPassword" placeholder="Confirm Password" required id="password_confirmation">
+                                    <span class="input-group-text bg-white toggle-password" style="cursor: pointer;">
+                                        <i class="fas fa-eye-slash text-muted"></i>
+                                    </span>
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: ADDRESS DETAILS -->
+                        <div id="step-2-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Delivery Information</h3>
+                            <p class="text-center mb-4" style="color: var(--munchies-dark-green);">Select your location on the map</p>
+
+                            <div id="map" class="mb-4" style="height: 200px; border-radius: 0.75rem;"></div>
+
+                            <div class="text-center text-muted my-3">
+                                <small>- OR Enter data manually -</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <select class="form-select form-control" asp-for="City" required>
+                                    <option value="">Select City</option>
+                                    <optgroup label="Riyadh Region">
+                                        <option value="Riyadh">Riyadh</option>
+                                        <option value="Al Kharj">Al Kharj</option>
+                                        <option value="Al Majmaah">Al Majmaah</option>
+                                    </optgroup>
+                                    <optgroup label="Makkah Region">
+                                        <option value="Jeddah">Jeddah</option>
+                                        <option value="Mecca">Mecca</option>
+                                        <option value="Taif">Taif</option>
+                                    </optgroup>
+                                    <optgroup label="Eastern Province">
+                                        <option value="Dammam">Dammam</option>
+                                        <option value="Khobar">Khobar</option>
+                                        <option value="Dhahran">Dhahran</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="text" class="form-control" asp-for="Street" placeholder="Street Name" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <input type="text" class="form-control" asp-for="Apartment" placeholder="Apartment, House Or Building Details">
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: NOTIFICATIONS -->
+                        <div id="step-3-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Notification Preferences</h3>
+                            <p class="text-center mb-4 text-muted">Tell us how you want to receive updates.</p>
+
+                            <div class="form-check p-4 mb-3 border rounded-3" style="border-color: var(--munchies-border-color); background-color: var(--munchies-light-green);">
+                                <input class="form-check-input m-3" type="checkbox" name="email_notifications" value="true" id="email-notif" checked>
+                                <label class="form-check-label fw-bold" for="email-notif" style="color: var(--munchies-dark-green);">
+                                    Email Updates
+                                </label>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">Receive weekly lunchbox inspiration and monthly promotions.</p>
+                            </div>
+
+                            <div class="form-check p-4 mb-4 border rounded-3" style="border-color: var(--munchies-border-color); background-color: var(--munchies-light-green);">
+                                <input class="form-check-input m-3" type="checkbox" name="sms_notifications" value="true" id="sms-notif">
+                                <label class="form-check-label fw-bold" for="sms-notif" style="color: var(--munchies-dark-green);">
+                                    SMS Alerts
+                                </label>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">Get delivery confirmations and critical service alerts via text message.</p>
+                            </div>
+
+                            <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;">
+                                Manage your settings later in your profile.
+                            </p>
+                        </div>
+
+                        <!-- STEP 4: CONFIRMATION -->
+                        <div id="step-4-content" class="step-content" style="display: none;">
+                            <h3 class="mb-4 text-center" style="color: var(--munchies-dark-green);">Review & Finish</h3>
+
+                            <div class="summary-box p-4 rounded-3">
+                                <h5 class="fw-bold" style="color: var(--munchies-dark-green);">All Done!</h5>
+                                <p class="text-muted mb-3" style="font-size: 0.9rem;">Review your details and click 'Finish' to complete registration.</p>
+
+                                <ul class="list-unstyled" style="font-size: 0.95rem;">
+                                    <li class="mb-2"><strong>Name:</strong> <span class="float-end text-break" id="summary-name">User Name</span></li>
+                                    <li class="mb-2"><strong>Email:</strong> <span class="float-end text-break" id="summary-email">user@example.com</span></li>
+                                    <li class="mb-2"><strong>Phone:</strong> <span class="float-end text-break" id="summary-phone">+966 XXX XXX</span></li>
+                                    <li class="mb-2"><strong>City:</strong> <span class="float-end" id="summary-city">Riyadh</span></li>
+                                    <li class="mb-2"><strong>Street:</strong> <span class="float-end text-break" id="summary-street">123 Main Street</span></li>
+                                    <li class="mb-2"><strong>Building:</strong> <span class="float-end text-break" id="summary-apartment">-</span></li>
+                                    <li class="mb-2"><strong>Updates:</strong> <span class="float-end" id="summary-notifs">Email Only</span></li>
+                                </ul>
+                            </div>
+
+                            <p class="text-center mt-4 fw-semibold" style="color: var(--munchies-dark-green);">
+                                You're one click away from simple lunch planning!
+                            </p>
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="row gx-3 mt-4" id="form-actions">
+                            <div class="col-6" id="back-button-col">
+                                <button type="button" id="back-button" class="btn btn-secondary w-100 py-2 rounded-3" style="display: none;">
+                                    Back
+                                </button>
+                            </div>
+                            <div class="col-6" id="next-button-col">
+                                <button type="button" id="next-button" class="btn btn-signup w-100 py-2 rounded-3">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-center mt-3 mb-0" style="font-size: 0.9rem;" id="login-link-container">
+                            Already have an account? <a asp-action="Login" asp-controller="Auth" style="text-decoration: none; color: var(--munchies-coral);"><u>Login</u></a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentStep = 1;
+            const totalSteps = 4;
+            let map, marker;
+
+            function initMap() {
+                const defaultLat = 24.7136;
+                const defaultLng = 46.6753;
+
+                map = L.map('map').setView([defaultLat, defaultLng], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+                marker.on('dragend', function(e) {
+                    const position = marker.getLatLng();
+                    console.log('New position:', position.lat, position.lng);
+                });
+
+                map.on('click', function(e) {
+                    marker.setLatLng(e.latlng);
+                });
+            }
+
+            function initMapIfNeeded() {
+                if (currentStep === 2 && !map) {
+                    setTimeout(() => {
+                        initMap();
+                        map.invalidateSize();
+                    }, 100);
+                }
+            }
+
+            document.querySelectorAll('.toggle-password').forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+
+            const stepContents = document.querySelectorAll('.step-content');
+            const nextButton = document.getElementById('next-button');
+            const backButton = document.getElementById('back-button');
+            const backButtonCol = document.getElementById('back-button-col');
+            const nextButtonCol = document.getElementById('next-button-col');
+            const loginLinkContainer = document.getElementById('login-link-container');
+            const form = document.getElementById('multi-step-form');
+
+            function updateFormVisibility(step) {
+                stepContents.forEach((content, index) => {
+                    content.style.display = (index + 1) === step ? 'block' : 'none';
+                });
+
+                if (step === 1) {
+                    backButton.style.display = 'none';
+                    backButtonCol.classList.remove('col-6');
+                    backButtonCol.classList.add('col-0');
+                    nextButtonCol.classList.remove('col-6');
+                    nextButtonCol.classList.add('col-12');
+                    nextButton.textContent = 'Sign Up';
+                    loginLinkContainer.style.display = 'block';
+                } else {
+                    backButton.style.display = 'block';
+                    backButtonCol.classList.add('col-6');
+                    backButtonCol.classList.remove('col-0');
+                    nextButtonCol.classList.add('col-6');
+                    nextButtonCol.classList.remove('col-12');
+                    loginLinkContainer.style.display = 'none';
+                }
+
+                if (step === totalSteps) {
+                    nextButton.textContent = 'Finish';
+                } else {
+                    nextButton.textContent = 'Next';
+                }
+
+                if (step === 2) {
+                    initMapIfNeeded();
+                }
+            }
+
+            function updateStepIndicator(step) {
+                for (let i = 1; i <= totalSteps; i++) {
+                    const circle = document.getElementById(`circle-${i}`);
+                    const text = document.getElementById(`text-${i}`);
+                    circle.classList.remove('completed', 'current');
+                    text.classList.remove('current');
+
+                    if (i < step) {
+                        circle.classList.add('completed');
+                        circle.innerHTML = '<i class="fas fa-check"></i>';
+                    } else if (i === step) {
+                        circle.classList.add('current');
+                        circle.textContent = i;
+                        text.classList.add('current');
+                    } else {
+                        circle.textContent = i;
+                    }
+                }
+            }
+
+            function updateSummary() {
+                const formData = new FormData(form);
+                document.getElementById('summary-name').textContent =
+                    `${formData.get('FirstName')} ${formData.get('LastName')}`;
+                document.getElementById('summary-email').textContent = formData.get('Email');
+                document.getElementById('summary-phone').textContent = formData.get('PhoneNumber');
+                document.getElementById('summary-city').textContent = formData.get('City') || 'Not set';
+                document.getElementById('summary-street').textContent = formData.get('Street') || 'Not set';
+                document.getElementById('summary-apartment').textContent = formData.get('Apartment') || '-';
+
+                const emailNotif = document.getElementById('email-notif').checked;
+                const smsNotif = document.getElementById('sms-notif').checked;
+                let notifSummary = "None";
+                if (emailNotif && smsNotif) { notifSummary = "Email & SMS"; }
+                else if (emailNotif) { notifSummary = "Email Only"; }
+                else if (smsNotif) { notifSummary = "SMS Only"; }
+                document.getElementById('summary-notifs').textContent = notifSummary;
+            }
+
+            function validateStep(step) {
+                const currentContent = document.getElementById(`step-${step}-content`);
+                const requiredInputs = currentContent.querySelectorAll('[required]');
+                let allValid = true;
+
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.reportValidity();
+                        allValid = false;
+                    }
+                });
+                return allValid;
+            }
+
+            nextButton.addEventListener('click', () => {
+                if (!validateStep(currentStep)) {
+                    return;
+                }
+
+                if (currentStep < totalSteps) {
+                    if (currentStep === totalSteps - 1) {
+                        updateSummary();
+                    }
+                    currentStep++;
+                    updateFormVisibility(currentStep);
+                    updateStepIndicator(currentStep);
+                } else {
+                    form.submit();
+                }
+            });
+
+            backButton.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateFormVisibility(currentStep);
+                    updateStepIndicator(currentStep);
+                }
+            });
+
+            updateFormVisibility(currentStep);
+            updateStepIndicator(currentStep);
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

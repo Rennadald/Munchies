@@ -1,0 +1,691 @@
+﻿@* Views/CustomMeal/Create.cshtml *@
+@using Lunchbox.Controllers
+@using Lunchbox.Helpers
+@{
+    ViewData["Title"] = "Create Custom Meal";
+    var items = ViewBag.Items as List<Lunchbox.Models.Item>;
+    var categories = ViewBag.Categories as List<string>;
+    var children = ViewBag.Children as List<Lunchbox.Models.Child>;
+    var customMeal = ViewBag.CustomMeal as Dictionary<string, CustomMealItem> ?? new Dictionary<string, CustomMealItem>();
+}
+
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #F9F6F3 0%, #f5f1eb 100%); min-height: 100vh;">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <div class="header-icon mb-3">
+                    <i class="fas fa-chef-hat text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h1 class="display-4 fw-bold gradient-text mb-3">Create Your Perfect Lunchbox</h1>
+                <p class="lead text-muted fs-5">Mix and match delicious items to build a custom meal that your child will love!</p>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-3 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fw-bold">Success!</h6>
+                        <p class="mb-0">@TempData["Success"]</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-circle me-3 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fw-bold">Oops!</h6>
+                        <p class="mb-0">@TempData["Error"]</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row">
+            <!-- Categories & Items Section -->
+            <div class="col-lg-8">
+                <!-- Category Navigation -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-4">
+                        <h5 class="fw-bold mb-0 text-center" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-layer-group me-2"></i>Choose Your Items
+                        </h5>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <!-- Category Tabs -->
+                        @if (categories != null && categories.Any())
+                        {
+                            <div class="category-tabs-container px-4 pt-3">
+                                <div class="nav nav-pills nav-fill category-tabs" id="categoryTabs" role="tablist">
+                                    @{
+                                        var isFirstTab = true;
+                                    }
+                                    @foreach (var category in categories)
+                                    {
+                                        var iconClass = CategoryHelper.GetCategoryIcon(category);
+                                        <div class="nav-item" role="presentation">
+                                            <button class="nav-link category-tab @(isFirstTab ? "active" : "")"
+                                                    id="tab-@category"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#@category"
+                                                    type="button" role="tab">
+                                                <div class="category-icon">
+                                                    <i class="fas fa-@iconClass"></i>
+                                                </div>
+                                                <span class="category-name">@category.ToUpper()</span>
+                                            </button>
+                                        </div>
+                                        isFirstTab = false;
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Category Content -->
+                            <div class="tab-content p-4" id="categoryTabsContent">
+                                @{
+                                    isFirstTab = true;
+                                }
+                                @foreach (var category in categories)
+                                {
+                                    var categoryItems = items?.Where(i => i.ItemCategory == category).ToList();
+                                    <div class="tab-pane fade @(isFirstTab ? "show active" : "")"
+                                         id="@category" role="tabpanel">
+                                        <div class="row g-4">
+                                            @if (categoryItems != null && categoryItems.Any())
+                                            {
+                                                @foreach (var item in categoryItems)
+                                                {
+                                                    <div class="col-xl-12">
+                                                        <div class="food-item-card card h-100 border-0 shadow-sm">
+                                                            <div class="card-body p-4">
+                                                                <div class="d-flex align-items-start">
+                                                                    <!-- Item Image -->
+                                                                    <div class="food-item-image me-4">
+                                                                        <div class="food-item-placeholder rounded-3 shadow-sm d-flex align-items-center justify-content-center">
+                                                                            <i class="fas fa-utensils text-muted"></i>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Item Details -->
+                                                                    <div class="flex-grow-1">
+                                                                        <h6 class="fw-bold mb-2 food-item-title">
+                                                                            @item.Name
+                                                                        </h6>
+                                                                        @if (!string.IsNullOrEmpty(item.Description))
+                                                                        {
+                                                                            var shortDesc = item.Description.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description;
+                                                                            <p class="text-muted small mb-3 food-item-description">
+                                                                                @shortDesc
+                                                                            </p>
+                                                                        }
+
+                                                                        <!-- Price & Add Button -->
+                                                                        <div class="d-flex justify-content-between align-items-center">
+                                                                            <div class="price-tag">
+                                                                                <span class="fw-bold text-success fs-5">
+                                                                                    SAR @((item.UnitPrice ?? 0).ToString("N2"))
+                                                                                </span>
+                                                                            </div>
+                                                                            <form asp-controller="CustomMeal" asp-action="AddItem" method="post">
+                                                                                @Html.AntiForgeryToken()
+                                                                                <input type="hidden" name="ItemId" value="@item.ItemId">
+                                                                                <input type="hidden" name="Quantity" value="1">
+                                                                                <button type="submit" class="btn-add-item">
+                                                                                    <i class="fas fa-plus me-2"></i>Add
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Nutrition Info -->
+                                                                <div class="nutrition-info mt-3">
+                                                                    <div class="row g-2 text-center">
+                                                                        <div class="col-3">
+                                                                            <div class="nutrition-value">
+                                                                                <i class="fas fa-fire text-danger me-1"></i>
+                                                                                @(item.Calories ?? 0)
+                                                                            </div>
+                                                                            <small class="nutrition-label">Calories</small>
+                                                                        </div>
+                                                                        <div class="col-3">
+                                                                            <div class="nutrition-value">
+                                                                                <i class="fas fa-dumbbell text-primary me-1"></i>
+                                                                                @((item.ProteinG ?? 0).ToString("N0"))g
+                                                                            </div>
+                                                                            <small class="nutrition-label">Protein</small>
+                                                                        </div>
+                                                                        <div class="col-3">
+                                                                            <div class="nutrition-value">
+                                                                                <i class="fas fa-bread-slice text-warning me-1"></i>
+                                                                                @((item.CarbsG ?? 0).ToString("N0"))g
+                                                                            </div>
+                                                                            <small class="nutrition-label">Carbs</small>
+                                                                        </div>
+                                                                        <div class="col-3">
+                                                                            <div class="nutrition-value">
+                                                                                <i class="fas fa-oil-can text-info me-1"></i>
+                                                                                @((item.FatG ?? 0).ToString("N0"))g
+                                                                            </div>
+                                                                            <small class="nutrition-label">Fat</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Allergies Warning -->
+                                                                @if (item.Allergies != null && item.Allergies.Any())
+                                                                {
+                                                                    <div class="allergy-warning mt-3">
+                                                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                                                        <small class="text-muted">
+                                                                            Contains: <span class="text-danger fw-semibold">@string.Join(", ", item.Allergies.Select(a => a.AllergyType))</span>
+                                                                        </small>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    isFirstTab = false;
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Meal Summary -->
+            <div class="col-lg-4">
+                <div class="meal-summary-card card border-0 shadow-sm sticky-top" style="top: 100px;">
+                    <div class="card-header bg-gradient-primary text-white border-0 py-4">
+                        <h5 class="fw-bold mb-0 text-center">
+                            <i class="fas fa-utensils me-2"></i>Your Custom Meal
+                        </h5>
+                    </div>
+
+                    <div class="card-body p-4">
+                        @if (customMeal.Any())
+                        {
+                            <!-- Selected Items -->
+                            <div class="selected-items-section mb-4">
+                                <h6 class="fw-bold mb-3 section-title">
+                                    <i class="fas fa-list-check me-2"></i>
+                                    Selected Items
+                                    <span class="badge bg-primary ms-2">@customMeal.Values.Sum(i => i.Quantity)</span>
+                                </h6>
+
+                                <div class="selected-items-list">
+                                    @foreach (var itemEntry in customMeal)
+                                    {
+                                        var itemKey = itemEntry.Key;
+                                        var item = itemEntry.Value;
+                                        <div class="selected-item-card">
+                                            <div class="d-flex align-items-center">
+                                                <!-- Item Image -->
+                                                <div class="selected-item-image me-3">
+                                                    <div class="selected-item-placeholder rounded-2 d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-utensils text-muted"></i>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Item Details -->
+                                                <div class="flex-grow-1">
+                                                    <h6 class="fw-bold mb-1 selected-item-name">@item.Name</h6>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="text-success fw-bold">
+                                                            SAR @((item.Price * item.Quantity).ToString("N2"))
+                                                        </span>
+                                                        <div class="quantity-controls">
+                                                            <form asp-controller="CustomMeal" asp-action="UpdateItem" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="itemKey" value="@itemKey">
+                                                                <input type="hidden" name="action" value="decrease">
+                                                                <button type="submit" class="btn-quantity @(item.Quantity <= 1 ? "disabled" : "")" disabled="@(item.Quantity <= 1)">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                            </form>
+                                                            <span class="quantity-display mx-2 fw-bold">@item.Quantity</span>
+                                                            <form asp-controller="CustomMeal" asp-action="UpdateItem" method="post" class="d-inline">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="itemKey" value="@itemKey">
+                                                                <input type="hidden" name="action" value="increase">
+                                                                <button type="submit" class="btn-quantity">
+                                                                    <i class="fas fa-plus"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form asp-controller="CustomMeal" asp-action="RemoveItem" method="post" class="d-inline ms-2">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="itemKey" value="@itemKey">
+                                                                <button type="submit" class="btn-remove">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Nutrition Summary -->
+                           
+                            var totalCalories = customMeal.Values.Sum(i => i.Calories * i.Quantity);
+                            var totalProtein = customMeal.Values.Sum(i => i.ProteinG * i.Quantity);
+                            var totalCarbs = customMeal.Values.Sum(i => i.CarbsG * i.Quantity);
+                            var totalFat = customMeal.Values.Sum(i => i.FatG * i.Quantity);
+                            var totalPrice = customMeal.Values.Sum(i => i.Price * i.Quantity);
+                            
+
+                            <div class="nutrition-summary-section mb-4">
+                                <h6 class="fw-bold mb-3 section-title">
+                                    <i class="fas fa-chart-pie me-2"></i>Nutrition Summary
+                                </h6>
+                                <div class="nutrition-summary-card">
+                                    <div class="row g-3 text-center">
+                                        <div class="col-3">
+                                            <div class="nutrition-total-value text-danger">@totalCalories</div>
+                                            <small class="nutrition-total-label">Calories</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="nutrition-total-value text-primary">@totalProtein.ToString("N0")g</div>
+                                            <small class="nutrition-total-label">Protein</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="nutrition-total-value text-warning">@totalCarbs.ToString("N0")g</div>
+                                            <small class="nutrition-total-label">Carbs</small>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="nutrition-total-value text-info">@totalFat.ToString("N0")g</div>
+                                            <small class="nutrition-total-label">Fat</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Price -->
+                            <div class="total-price-section mb-4">
+                                <div class="total-price-card">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold fs-6">Total Price:</span>
+                                        <span class="fw-bold fs-4 total-price">
+                                            SAR @totalPrice.ToString("N2")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <form asp-controller="CustomMeal" asp-action="AddToCart" method="post" class="mb-3">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-add-to-cart w-100">
+                                        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                                    </button>
+                                </form>
+
+                                <form asp-controller="CustomMeal" asp-action="Clear" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-clear-meal w-100">
+                                        <i class="fas fa-trash me-2"></i> Clear LunchBox
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Empty State -->
+                            <div class="empty-state text-center py-5">
+                                <div class="empty-icon mb-4">
+                                    <i class="fas fa-salad text-muted" style="font-size: 4rem;"></i>
+                                </div>
+                                <h6 class="fw-bold mb-3" style="color: var(--munchies-dark-green);">Your Meal is Empty</h6>
+                                <p class="text-muted mb-4">Start building your perfect lunchbox by adding delicious items from the categories!</p>
+                                <div class="empty-actions">
+                                    <i class="fas fa-arrow-left text-muted me-2"></i>
+                                    <span class="text-muted small">Choose items from the left</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --munchies-dark-green: #2d5016;
+            --munchies-green: #5a8f3a;
+            --munchies-light-green: #a6b28b;
+            --munchies-coral: #ff6b6b;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--munchies-dark-green) 0%, var(--munchies-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bg-gradient-primary {
+            background: var(--munchies-green) !important;
+        }
+
+        /* Category Tabs */
+        .category-tabs-container {
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .category-tabs {
+            gap: 8px;
+        }
+
+        .category-tab {
+            border: 2px solid #e9ecef !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            background: white;
+            transition: all 0.3s ease;
+            color: var(--munchies-dark-green);
+        }
+
+        .category-tab:hover,
+        .category-tab.active {
+            border-color: var(--munchies-green) !important;
+            background: var(--munchies-green) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(166, 178, 139, 0.3);
+        }
+
+        .category-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .category-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Food Item Cards */
+        .food-item-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .food-item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        }
+
+        .food-item-image img,
+        .food-item-placeholder {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .food-item-placeholder {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .food-item-title {
+            color: var(--munchies-dark-green);
+            font-size: 1.1rem;
+        }
+
+        .food-item-description {
+            line-height: 1.4;
+        }
+
+        .btn-add-item {
+            background: linear-gradient(135deg, var(--munchies-coral), #e06d48);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(240, 101, 67, 0.3);
+        }
+
+        /* Nutrition Info */
+        .nutrition-info {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .nutrition-value {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .nutrition-label {
+            color: #6c757d;
+            font-size: 0.75rem;
+        }
+
+        .allergy-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        /* Meal Summary Card */
+        .meal-summary-card {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            color: var(--munchies-dark-green);
+            font-size: 1rem;
+        }
+
+        /* Selected Items */
+        .selected-item-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .selected-item-image img,
+        .selected-item-placeholder {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+
+        .selected-item-placeholder {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .selected-item-name {
+            color: var(--munchies-dark-green);
+            font-size: 0.9rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-quantity {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-quantity:hover:not(.disabled) {
+            background: var(--munchies-green);
+            border-color: var(--munchies-green);
+            color: white;
+        }
+
+        .btn-quantity.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-remove {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #dc3545;
+            background: white;
+            color: #dc3545;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-remove:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .quantity-display {
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Nutrition Summary */
+        .nutrition-summary-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .nutrition-total-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .nutrition-total-label {
+            color: #6c757d;
+            font-size: 0.75rem;
+        }
+
+        /* Total Price */
+        .total-price-card {
+            background: linear-gradient(135deg, var(--munchies-light-green), #e8f5e8);
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid var(--munchies-green);
+        }
+
+        .total-price {
+            color: var(--munchies-dark-green);
+        }
+
+        /* Action Buttons */
+        .btn-add-to-cart {
+            background: linear-gradient(135deg, var(--munchies-coral), #e06d48);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(240, 101, 67, 0.4);
+        }
+
+        .btn-clear-meal {
+            background: transparent;
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear-meal:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            opacity: 0.7;
+        }
+
+        .empty-actions {
+            border-top: 1px solid #e9ecef;
+            padding-top: 16px;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .category-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+
+            .category-tab {
+                min-width: 120px;
+                white-space: nowrap;
+            }
+
+            .food-item-card .d-flex {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .food-item-image {
+                margin: 0 auto 12px auto;
+            }
+        }
+    </style>
+}

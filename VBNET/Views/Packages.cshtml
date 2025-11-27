@@ -1,0 +1,144 @@
+﻿@model List<Lunchbox.Models.MealPackage>
+@{
+    ViewData["Title"] = "Meal Packages";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="fw-bold" style="color: var(--munchies-dark-green);">Meal Packages</h1>
+            <p class="lead">Choose from our specially curated meal packages</p>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var package in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 shadow-sm border-0 package-card">
+                        @if (package.DiscountPercent > 0)
+                        {
+                            <span class="discount-badge">-@package.DiscountPercent%</span>
+                        }
+                        <div class="card-body text-center p-4">
+                            <img src="~/images/p@(Model.IndexOf(package) + 1).png" height="60px" class="mb-3" alt="@package.PackageName">
+                            <h3 class="fw-bold" style="color: var(--munchies-dark-green);">@package.PackageName</h3>
+                            <p class="mb-1 text-uppercase fw-semibold" style="color: var(--munchies-dark-green);">
+                                @package.MealsPerDay Days - @package.MealsPerDay Meals
+                            </p>
+                            <div class="d-flex justify-content-center align-items-baseline mb-4">
+                                @if (package.DiscountPercent > 0)
+                                {
+                                    var discountedPrice = package.Price * (1 - package.DiscountPercent / 100);
+                                    <span class="package-price-new">SAR @discountedPrice?.ToString("N2")</span>
+                                    <span class="package-price-old">SAR @package.Price?.ToString("N2")</span>
+                                }
+                                else
+                                {
+                                    <span class="package-price-new">SAR @package.Price?.ToString("N2")</span>
+                                }
+                            </div>
+                            <ul class="package-includes-list list-unstyled px-md-3 text-start">
+                                <p class="fw-bold mb-2">Includes:</p>
+                                <li><i class="fas fa-check-circle"></i> @package.PackageDescription</li>
+                                <li><i class="fas fa-check-circle"></i> Fresh ingredients daily</li>
+                                <li><i class="fas fa-check-circle"></i> Free delivery</li>
+                            </ul>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-controller="Order" asp-action="CreatePackageOrder" asp-route-packageId="@package.MealPackageId" class="btn btn-order-package">Order Package</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Auth" asp-action="Register" class="btn btn-order-package">Order Package</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 text-center">
+                <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                <p class="text-muted">No packages available at the moment. Please check back later!</p>
+                <a asp-controller="Home" asp-action="Index" class="btn" style="background-color: var(--munchies-coral); color: white;">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .package-card {
+            transition: transform 0.3s ease;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .package-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+            }
+
+        .discount-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .package-price-new {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--munchies-dark-green);
+            margin-right: 10px;
+        }
+
+        .package-price-old {
+            font-size: 1.2rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .package-includes-list li {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .package-includes-list i {
+            color: var(--munchies-green);
+            margin-right: 10px;
+        }
+
+        .btn-order-package {
+            background-color: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+            .btn-order-package:hover {
+                background-color: #e06d48;
+                color: white;
+                transform: scale(1.05);
+            }
+    </style>
+}

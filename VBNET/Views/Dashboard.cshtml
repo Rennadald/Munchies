@@ -1,0 +1,223 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var parent = ViewBag.Parent as Lunchbox.Models.Parent;
+    var recentOrders = ViewBag.RecentOrders as List<Lunchbox.Models.Order>;
+    var childrenCount = (int)ViewBag.ChildrenCount;
+    var totalOrders = (int)ViewBag.TotalOrders;
+    var upcomingDeliveries = (int)ViewBag.UpcomingDeliveries;
+}
+
+<div class="container-fluid py-4">
+    <div class="container">
+        <!-- Welcome Header -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-6 fw-bold gradient-text mb-2">
+                            Welcome back, @parent.FirstName!
+                        </h1>
+                        <p class="lead text-muted">Here's your Munchies dashboard</p>
+                    </div>
+                    <div class="text-end">
+                        <a asp-controller="Parent" asp-action="MealTracking" class="btn btn-signup">
+                            <i class="fas fa-calendar-alt me-2"></i>View Meal Schedule
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-4">
+                <div class="stats-card card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="stats-icon mb-3">
+                            <i class="fas fa-child fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="fw-bold text-primary mb-2">@childrenCount</h3>
+                        <h6 class="text-muted mb-0">Children</h6>
+                        <a asp-controller="Child" asp-action="Index" class="btn btn-sm btn-outline-primary mt-3">
+                            Manage Children
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stats-card card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="stats-icon mb-3">
+                            <i class="fas fa-shopping-bag fa-2x text-success"></i>
+                        </div>
+                        <h3 class="fw-bold text-success mb-2">@totalOrders</h3>
+                        <h6 class="text-muted mb-0">Total Orders</h6>
+                        <a asp-controller="Order" asp-action="History" class="btn btn-sm btn-outline-success mt-3">
+                            View Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stats-card card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="stats-icon mb-3">
+                            <i class="fas fa-truck fa-2x text-warning"></i>
+                        </div>
+                        <h3 class="fw-bold text-warning mb-2">@upcomingDeliveries</h3>
+                        <h6 class="text-muted mb-0">Upcoming This Week</h6>
+                        <a asp-controller="Parent" asp-action="MealTracking" class="btn btn-sm btn-outline-warning mt-3">
+                            Track Meals
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Recent Orders -->
+            <div class="col-lg-12 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                            <i class="fas fa-clock-rotate-left me-2"></i>Recent Orders
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (recentOrders != null && recentOrders.Count > 0)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Child</th>
+                                            <th>Delivery Date</th>
+                                            <th>Items</th>
+                                            <th>Status</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var order in recentOrders)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-child text-muted me-2"></i>
+                                                        <span class="fw-semibold">@order.Child.Name</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        @order.DeliveryDate?.ToString("MMM dd, yyyy")
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <small>
+                                                        @order.OrderItems.Count items
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge status-@order.DeliveryStatus?.ToLower()">
+                                                        @order.DeliveryStatus
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="fw-bold text-success">
+                                                        SAR @order.TotalAmount?.ToString("N2")
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a asp-controller="Order" asp-action="History" class="btn btn-outline-primary">
+                                    View All Orders
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No orders yet</h6>
+                                <p class="text-muted mb-3">Start by creating your first order!</p>
+                                <a asp-controller="Home" asp-action="Lunchboxes" class="btn btn-signup">
+                                    <i class="fas fa-utensils me-2"></i>Order Now
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, var(--munchies-dark-green) 0%, var(--munchies-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-card {
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+            .stats-card:hover {
+                transform: translateY(-5px);
+            }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(var(--bs-primary-rgb), 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background: #d1edff;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .btn-signup {
+            background: var(--munchies-coral);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.3s;
+        }
+
+            .btn-signup:hover {
+                background: #e06d48;
+                color: white;
+            }
+    </style>
+}

@@ -1,0 +1,320 @@
+﻿@{
+    ViewData["Title"] = "Feedback Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 fw-bold mb-2" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-star me-2"></i>Feedback Report
+                    </h1>
+                    <p class="text-muted mb-0">Analyze customer satisfaction and meal ratings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Summary -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon primary">
+                    <i class="fas fa-star"></i>
+                </div>
+                @{
+                    var avgRating = ViewBag.FeedbackSummary != null ? ((dynamic)ViewBag.FeedbackSummary).AverageRating : 0.0;
+                }
+                <h3 class="fw-bold text-primary">@string.Format("{0:F1}", avgRating)/5</h3>
+                <p class="text-muted mb-0">Average Rating</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon success">
+                    <i class="fas fa-comment"></i>
+                </div>
+                @{
+                    var totalReviews = ViewBag.FeedbackSummary != null ? ((dynamic)ViewBag.FeedbackSummary).TotalReviews : 0;
+                }
+                <h3 class="fw-bold text-success">@totalReviews</h3>
+                <p class="text-muted mb-0">Total Reviews</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon info">
+                    <i class="fas fa-users"></i>
+                </div>
+                @{
+                    var uniqueReviewers = ViewBag.FeedbackSummary != null ? ((dynamic)ViewBag.FeedbackSummary).UniqueReviewers : 0;
+                }
+                <h3 class="fw-bold text-info">@uniqueReviewers</h3>
+                <p class="text-muted mb-0">Unique Reviewers</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon warning">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                @{
+                    // Calculate review rate from ViewBag data
+                    double reviewRate = 0.0;
+                    if (ViewBag.FeedbackSummary != null && ViewBag.TotalOrders != null)
+                    {
+                        var totalOrdersCount = (int)ViewBag.TotalOrders;
+                        var totalReviewsCount = ((dynamic)ViewBag.FeedbackSummary).TotalReviews;
+                        reviewRate = totalOrdersCount > 0 ? ((double)totalReviewsCount / totalOrdersCount) * 100 : 0.0;
+                    }
+                }
+                <h3 class="fw-bold text-warning">@string.Format("{0:F1}", reviewRate)%</h3>
+                <p class="text-muted mb-0">Review Rate</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Top Rated Meals -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-trophy me-2"></i>Top Rated Meals & Items
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.TopRatedMeals != null && ((List<dynamic>)ViewBag.TopRatedMeals).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Meal/Item</th>
+                                        <th class="text-center">Rating</th>
+                                        <th class="text-center">Reviews</th>
+                                        <th class="text-center">Stars</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var topRatedMeals = (List<dynamic>)ViewBag.TopRatedMeals;
+                                        for (int index = 0; index < topRatedMeals.Count; index++)
+                                        {
+                                            var meal = topRatedMeals[index];
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge @(index < 3 ? "bg-warning text-dark" : "bg-light text-dark") me-2">
+                                                            @(index + 1)
+                                                        </span>
+                                                        <div>
+                                                            <strong>@meal.Name</strong>
+                                                            <br>
+                                                            <small class="text-muted">@meal.ItemCategory</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="fw-bold text-primary">@((double)meal.AverageRating).ToString("F1")/5</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="fw-bold text-info">@meal.ReviewCount</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="star-rating">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fas fa-star @(i <= Math.Round((double)meal.AverageRating) ? "text-warning" : "text-dark")"></i>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-utensils fa-2x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No rating data available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Distribution -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-chart-pie me-2"></i>Rating Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RatingDistribution != null && ((List<dynamic>)ViewBag.RatingDistribution).Count > 0)
+                    {
+                        <div class="mt-3">
+                            @foreach (var distribution in (List<dynamic>)ViewBag.RatingDistribution)
+                            {
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="star-rating-small">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i <= distribution.RatingStars ? "text-warning" : "text-dark")"></i>
+                                        }
+                                    </div>
+                                    <span class="fw-bold text-primary">@distribution.Count</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-pie fa-2x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No rating distribution data</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="fw-bold mb-0" style="color: var(--munchies-dark-green);">
+                        <i class="fas fa-comments me-2"></i>Recent Reviews
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentReviews != null && ((List<dynamic>)ViewBag.RecentReviews).Count > 0)
+                    {
+                        <div class="row">
+                            @foreach (var review in (List<dynamic>)ViewBag.RecentReviews)
+                            {
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="review-card p-3 border rounded h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h6 class="fw-bold mb-1">@review.FirstName @review.LastName</h6>
+                                                <small class="text-muted">Order #@review.OrderId</small>
+                                            </div>
+                                            <div class="star-rating-small">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="fas fa-star @(i <= review.RatingStars ? "text-warning" : "text-dark")"></i>
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(review.Comment))
+                                        {
+                                            <p class="mb-2 text-dark">@(review.Comment.Length > 120 ? review.Comment.Substring(0, 120) + "..." : review.Comment)</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-2 text-muted fst-italic">No comment provided</p>
+                                        }
+                                        <small class="text-muted">
+                                            @((DateTime)review.RatedAt).ToString("MMM d, yyyy h:mm tt")
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-comments fa-2x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No recent reviews available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .stats-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .stats-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+            .stats-icon.primary {
+                background: rgba(0, 123, 255, 0.1);
+                color: #007bff;
+            }
+
+            .stats-icon.success {
+                background: rgba(40, 167, 69, 0.1);
+                color: #28a745;
+            }
+
+            .stats-icon.info {
+                background: rgba(23, 162, 184, 0.1);
+                color: #17a2b8;
+            }
+
+            .stats-icon.warning {
+                background: rgba(255, 193, 7, 0.1);
+                color: #ffc107;
+            }
+
+        .star-rating {
+            font-size: 0.9rem;
+        }
+
+        .star-rating-small {
+            font-size: 0.8rem;
+        }
+
+        .review-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+
+            .review-card:hover {
+                background: #fff;
+                border-color: var(--munchies-dark-green);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+        :root {
+            --munchies-dark-green: #2e8b57;
+        }
+    </style>
+}

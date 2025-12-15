@@ -1,0 +1,219 @@
+:root {
+    --munchies-green: #A6B28B;
+    --munchies-light-green: #d8e5d9; /* A lighter green for backgrounds/accents */
+    --munchies-dark-green: #1C352D;
+    --munchies-coral: #F3845B;
+    --munchies-cream: #E8CEC0;
+    --munchies-feature-red: #ffffff;
+    --munchies-peach: #F3C2B0;
+    --munchies-border-color: #F3C2B0;
+    --munchies-pink-dark: #E8CEC0;
+}
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--munchies-light-green) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background: #F9F6F3 !important;
+
+}
+/* Custom Buttons for Nav */
+.btn-signin {
+    color: var(--munchies-green);
+    background-color: transparent;
+    border: 2px solid var(--munchies-green);
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s;
+}
+.btn-signin:hover {
+    background-color: var(--munchies-green);
+    color: white;
+    border-color: var(--munchies-green);
+}
+
+.btn-signup {
+    background-color:var(--munchies-pink-dark) ;
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+}
+.btn-signup:hover {
+    background-color: #e06d48; /* Slightly darker coral */
+    color: white;
+}
+
+/* --- New Full Background Wrapper --- */
+.content-wrapper {
+    background-image: url('../images/main_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-grow: 1; /* Ensures it takes up remaining vertical space */
+    position: relative;
+}
+
+/* --- Collage Styling (Keep for design consistency) --- */
+.image-collage {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    z-index: 10;
+    padding: 20px;
+}
+
+.collage-item {
+    width: 120px;
+    height: 80px;
+    margin: 10px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: absolute;
+    background-color: #a7bfa4; /* Placeholder for image */
+    border: 4px solid var(--munchies-light-green);
+    opacity: 0.9;
+}
+
+/* Positioning the angled boxes (mimicking the collage in the image) */
+.item-1 { top: 70px; left: 10px; transform: rotate(-10deg); width: 150px; height: 100px;}
+.item-2 { top: 180px; left: 10px; transform: rotate(5deg); }
+.item-3 { top: 260px; left: 50px; transform: rotate(-15deg); width: 140px; height: 90px; }
+.item-4 { top: 380px; left: 0px; transform: rotate(10deg); }
+.item-5 { top: 480px; left: 20px; transform: rotate(-5deg); width: 130px; }
+
+@media (max-width: 991.98px) {
+    .image-collage { display: none; } /* Hide collage on small screens */
+}
+
+/* --- Text Section Styling --- */
+.marketing-text {
+    color: var(--munchies-dark-green);
+    padding: 50px;
+    padding-top: 150px;
+    position: relative;
+    z-index: 20;
+}
+
+.marketing-text h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+.marketing-text p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+.marketing-text .accent-bar {
+    width: 8px;
+    height: 40px;
+    background-color: var(--munchies-coral);
+    position: absolute;
+    right: 0px;
+    top: 140px;
+    border-radius: 2px;
+}
+
+.form-card {
+
+    border-radius: 25px;
+    padding: 40px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Form Control and Input Styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    height: 50px; /* Consistent height for inputs */
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--munchies-green);
+    box-shadow: 0 0 0 0.25rem rgba(166, 178, 139, 0.25);
+}
+
+/* --- Step Indicator Styling --- */
+.step-indicator {
+    padding: 9px 31px !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border: 1px solid var(--munchies-border-color);
+    border-radius: 20px;
+    background-color: var(--munchies-pink-dark); /* Background color of the container */
+}
+.step-circle {
+    width: 30px; /* Slightly larger circles */
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--munchies-border-color);
+    background-color: #fff;
+    color: var(--munchies-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.step-circle.completed {
+    /* Step 1: Account (Green circle, white checkmark) */
+    background-color: var(--munchies-green);
+    border-color: var(--munchies-green);
+    color: white;
+    font-size: 1rem;
+}
+
+.step-circle.current {
+    /* Step 2: Address (Empty white circle with dark border/subtle glow) */
+    background-color: #fff;
+    border-color: var(--munchies-dark-green);
+    box-shadow: 0 0 0 4px rgba(166, 178, 139, 0.2);
+    color: var(--munchies-dark-green);
+}
+
+.step-text {
+    font-size: 0.8rem;
+    color: var(--munchies-dark-green);
+}
+
+.step-text.current {
+    font-weight: 600;
+    color: var(--munchies-dark-green);
+}
+
+.step-text-wrap {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    align-items: center;
+}
+.step-line {
+    position: absolute;
+    top: 14px; /* Adjust based on circle size */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 2px; /* Thicker line */
+    background-color: var(--munchies-border-color);
+    z-index: 0;
+}
+
+/* Button Styling */
+.btn-munchies-cream {
+    /* Used for the 'Back' button */
+    background-color: var(--munchies-cream);
+    color: var(--munchies-dark-green);
+    border: 1px solid var(--munchies-border-color);
+    border-radius: 10px;
+    font-weight: 600;
+}

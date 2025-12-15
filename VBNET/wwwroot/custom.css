@@ -1,0 +1,485 @@
+/* Define custom colors */
+:root {
+    --munchies-green: #A6B28B;
+    --munchies-light-green: #d8e5d9; /* A lighter green for backgrounds/accents */
+    --munchies-dark-green: #304E35;
+    --munchies-coral: #F3845B;
+    --munchies-cream: #E8CEC0;
+    --munchies-feature-red: #ffffff;
+    --munchies-peach: #F3C2B0; /* New color from the app download image */
+}
+.bg-primary {
+    background: var(--munchies-green) !important;
+}
+.bg-warning {
+    --bs-bg-opacity: 1;
+    background-color: rgb(255 188 183) !important;
+}
+.activeNavigation {
+    color: #ffffff !important;
+    background: #a6b28b !important;
+    padding: 10px 30px !important;
+    border-radius: 10px !important;
+    margin: 0 13px !important;
+}
+body {
+    /*font-family: 'Inter', sans-serif;*/
+    background-color: white;
+}
+.navbar {
+    background: #F9F6F3 !important;
+
+}
+/* Custom Buttons for Nav */
+.btn-signin {
+    color: var(--munchies-green);
+    background-color: transparent;
+    border: 2px solid var(--munchies-green);
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s;
+}
+.btn-outline-primary {
+    --bs-btn-color: #f3845b;
+    --bs-btn-border-color:#f3845b;
+}
+
+    .btn-signin:hover {
+    background-color: var(--munchies-green);
+    color: white;
+    border-color: var(--munchies-green);
+}
+
+.btn-signup {
+    background-color: var(--munchies-coral);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+}
+.btn-signup:hover,.btn-outline-primary:hover {
+    background-color: #e06d48; /* Slightly darker coral */
+    color: white;
+}
+
+/* Hero Section Styling - UPDATED */
+.hero-section {
+    /* Use the solid color as a fallback in case the image doesn't load */
+    background-color: var(--munchies-green);
+    background-image: url('../images/hero.png');
+    background-repeat: no-repeat;
+    /* Key changes for full width/height coverage */
+    background-size: cover;
+    background-position: center;
+
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    min-height: 500px;
+}
+
+.hero-content {
+    z-index: 1; /* Bring content above the shapes */
+    position: relative;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    /* Kept the dark color for title as in the original design (adjust if visibility is an issue with your image) */
+    color: var(--munchies-dark-green);
+    margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #333;
+}
+
+.hero-cta-text {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--munchies-feature-red);
+}
+
+/* Lunchbox Images Wrapper */
+.lunchbox-images {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+}
+.lunchbox-img-top, .lunchbox-img-bottom {
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 300px;
+    object-fit: cover;
+    position: absolute;
+}
+.lunchbox-img-top {
+    top: 0;
+    right: 0;
+    max-width: 300px;
+    height: 200px;
+    background-color: #F8E790; /* Placeholder color for top box */
+}
+.lunchbox-img-bottom {
+    bottom: 0;
+    left: 0;
+    max-width: 300px;
+    height: 250px;
+    background-color: #79D179; /* Placeholder color for bottom box */
+    transform: translate(20px, 20px);
+}
+
+/* Feature Section Styling */
+.feature-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--munchies-dark-green);
+    margin-bottom: 0.5rem;
+}
+
+.feature-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--munchies-feature-red);
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    padding: 2rem;
+    transition: all 0.3s;
+    background-color: #F9F6F3;
+    height: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.feature-card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+}
+
+.feature-icon-wrapper {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 50%;
+}
+
+/* Special Meal Packages Section - NEW BACKGROUND IMAGE */
+.packages-section {
+    /*background-color: var(--munchies-green); !* Fallback/Base color *!*/
+    background-image: url('../images/packages.png'); /* New background image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 5rem 0;
+}
+.packages-header {
+    color: var(--munchies-dark-green);
+    font-size: 3rem;
+    font-weight: 900;
+}
+.package-card {
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #000000;
+    position: relative;
+    height: 100%;
+}
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--munchies-feature-red);
+    color: white;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    z-index: 10;
+}
+.package-price-old {
+    text-decoration: line-through;
+    color: var(--munchies-dark-green);
+    opacity: 0.6;
+    font-size: 1.25rem;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+.package-price-new {
+    color: var(--munchies-dark-green);
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+.package-includes-list {
+    padding-left: 0; /* Override default list padding */
+    margin-top: 1rem;
+}
+.package-includes-list li {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 0.75rem;
+    color: var(--munchies-dark-green);
+    font-weight: 500;
+    font-size: 1.05rem;
+}
+.package-includes-list i {
+    color: var(--munchies-green);
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+.btn-order-package {
+    background-color: var(--munchies-coral);
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    width: 80%; /* Adjusted for card style */
+    margin-top: 1.5rem;
+    padding: 0.5rem 1rem;
+}
+.btn-order-package:hover {
+    background-color: #e06d48;
+    color: white;
+}
+
+/* View All Packages Button Style (updated class name) */
+.btn-view-all-packages {
+    background-color: white;
+    border: 2px solid var(--munchies-dark-green);
+    color: var(--munchies-dark-green);
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s;
+}
+.btn-view-all-packages:hover {
+    background-color: var(--munchies-dark-green);
+    color: white;
+}
+
+/* Top Favorites Section */
+.favorites-section {
+    background-color: white; /* White background */
+}
+.favorite-card {
+    background-color: transparent; /* No background color on the card itself */
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+}
+.favorite-rating {
+    width: 250px; /* Aligned with mock image width */
+    text-align: left !important;
+    color: var(--munchies-dark-green);
+}
+.btn-order-favorite {
+    /* Peach/Coral color from the mock image */
+    background-color: var(--munchies-peach);
+    color: var(--munchies-feature-red); /* Darker text for contrast */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    border: none;
+    width: 250px !important; /* Match image width */
+    transition: background-color 0.3s;
+}
+.btn-order-favorite:hover {
+    background-color: #f1b39c;
+    color: var(--munchies-feature-red);
+}
+
+/* View All Lunchboxes Button Style */
+.btn-view-all-favorites {
+    background-color: white;
+    border: 1px solid var(--munchies-dark-green);
+    color: var(--munchies-dark-green);
+    font-weight: 500;
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.btn-view-all-favorites:hover {
+    background-color: var(--munchies-dark-green);
+    color: white;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+    background-color: white;
+    padding: 5rem 0;
+}
+.how-it-works-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--munchies-dark-green);
+    margin-bottom: 3rem;
+}
+.how-it-works-card {
+    text-align: center;
+}
+.how-it-works-icon-wrapper {
+    background-color: var(--munchies-light-green); /* Light green circle */
+    color: var(--munchies-dark-green);
+    font-size: 2.5rem;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--munchies-dark-green); /* Border around the circle */
+}
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--munchies-dark-green);
+    margin-bottom: 0.5rem;
+}
+.step-description {
+    color: #6c757d; /* text-muted */
+}
+
+/* FINAL CTA Styling - NEW BACKGROUND IMAGE */
+.app-download-section {
+    background-color: var(--munchies-peach); /* Fallback */
+    background-image: url('app.png'); /* New background image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* We keep this container for content structure, but removed z-index as wave is gone */
+.app-download-container {
+    position: relative;
+}
+
+.cta-title-final {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--munchies-dark-green);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+.cta-subtitle-final {
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+.btn-signup-final {
+    background-color: white;
+    border: 1px solid #ccc;
+    color: var(--munchies-dark-green);
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+}
+.btn-signup-final:hover {
+    background-color: var(--munchies-dark-green);
+    color: white;
+}
+
+/* Footer Styling based on the image */
+footer {
+    background-color: var(--munchies-green);
+    color: white;
+    padding: 3rem 0;
+}
+.footer-logo {
+    max-width: 150px; /* Adjust size of logo */
+}
+.footer-heading {
+    color: white; /* Headings are white in the image */
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+.footer-link, .footer-contact-text, .footer-contact-icon {
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+    font-weight: 300;
+}
+.footer-link:hover {
+    color: var(--munchies-dark-green);
+}
+.footer-social-icon {
+    font-size: 1.5rem;
+    color: white;
+    transition: color 0.2s;
+}
+.footer-social-icon:hover {
+    color: var(--munchies-dark-green);
+}
+.contact-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.contact-info i {
+    margin-right: 0.5rem;
+}
+
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    .lunchbox-images {
+        min-height: 200px;
+        margin-top: 2rem;
+    }
+    .lunchbox-img-top, .lunchbox-img-bottom {
+        position: static;
+        transform: none;
+        margin: 1rem auto;
+        display: block;
+    }
+    .packages-header {
+        font-size: 2rem;
+    }
+    .package-card {
+        padding: 1.5rem;
+    }
+    .favorite-rating, .btn-order-favorite {
+        width: 80% !important; /* Make buttons responsive on mobile */
+    }
+    .favorite-card img {
+        max-width: 80% !important;
+    }
+    .how-it-works-title {
+        font-size: 2rem;
+    }
+    /* CTA Responsive */
+    .cta-title-final {
+        font-size: 2rem;
+    }
+    .footer-col {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .footer-social-links {
+        justify-content: center !important;
+    }
+}
